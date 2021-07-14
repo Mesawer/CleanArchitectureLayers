@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Mesawer.DomainLayer</RootNamespace>
+    <PackageId>Mesawer.DomainLayer</PackageId>
+    <Authors>Mesawer</Authors>
+    <Product />
+    <Description>This library contains all the required reusable components in the domain layer.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>mesawer, domain, layer, tiers, extensions, helpers</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>
