@@ -2,8 +2,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Mesawer.ApplicationLayer.Enums;
+using Mesawer.ApplicationLayer.Exceptions;
+using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.ApplicationLayer.Interfaces;
 using Mesawer.ApplicationLayer.Models;
+using Mesawer.InfrastructureLayer.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using IdentityOptions = Mesawer.InfrastructureLayer.Models.IdentityOptions;
@@ -12,10 +15,10 @@ namespace Mesawer.InfrastructureLayer.Identity
 {
     public class TokenGeneratorService<T> : ITokenGeneratorService<T> where T : ApplicationUser
     {
-        private readonly UserManager<T>         _userManager;
-        private readonly IMemoryCacheService    _cache;
-        private readonly IDateTime              _dateTime;
-        private readonly IdentityOptions _identityOptions;
+        private readonly UserManager<T>      _userManager;
+        private readonly IMemoryCacheService _cache;
+        private readonly IDateTime           _dateTime;
+        private readonly IdentityOptions     _identityOptions;
 
         public TokenGeneratorService(
             UserManager<T> userManager,
@@ -88,7 +91,18 @@ namespace Mesawer.InfrastructureLayer.Identity
         }
 
         private void AddToCache(TokenType type, string userId, string token, string longToken, object extraData = null)
-            => _cache.Add(userId,
+        {
+            var old = _cache.Get(type, userId);
+
+            if (old != null && old.ExpiresAt.IsNewerThan(_dateTime.Now) && old.NumberOfTries < 5)
+            {
+                var diffMinutes = _identityOptions.TokenResetPeriod - _identityOptions.TokenExpirationPeriod;
+
+                if (old.ExpiresAt.AddMinutes(diffMinutes).IsNewerThan(_dateTime.Now))
+                    throw new BadRequestException(SharedRes.TooSoonForNewToken);
+            }
+
+            _cache.Add(userId,
                 new TokenObject
                 {
                     UserId    = userId,
@@ -98,6 +112,7 @@ namespace Mesawer.InfrastructureLayer.Identity
                     ExpiresAt = _dateTime.Now.AddMinutes(_identityOptions.TokenExpirationPeriod),
                     ExtraData = extraData
                 });
+        }
 
         private static string GenerateToken()
             => Guid.NewGuid().ToString("N").ToUpper()[..3]

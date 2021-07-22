@@ -132,4 +132,7 @@
   <data name="UnauthorizedDevice" xml:space="preserve">
     <value />
   </data>
+  <data name="TooSoonForNewToken" xml:space="preserve">
+    <value></value>
+  </data>
 </root>

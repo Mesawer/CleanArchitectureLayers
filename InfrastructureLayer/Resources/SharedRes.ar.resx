@@ -132,4 +132,7 @@
   <data name="UnauthorizedDevice" xml:space="preserve">
     <value>هذا الجهاز غير مسجل لهذا المستخدم</value>
   </data>
+  <data name="TooSoonForNewToken" xml:space="preserve">
+    <value>الوقت قريب جدا على طلب رمز أخر</value>
+  </data>
 </root>

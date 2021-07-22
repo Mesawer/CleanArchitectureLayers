@@ -47,6 +47,11 @@ namespace Mesawer.InfrastructureLayer.Models
         /// </summary>
         public int TokenExpirationPeriod { get; set; } = 60;
 
+        /// <summary>
+        /// The period before which the user can't generate another token (in minutes)
+        /// </summary>
+        public int TokenResetPeriod { get; set; } = 5;
+
         private PasswordOptions _password = new();
 
         /// <summary>

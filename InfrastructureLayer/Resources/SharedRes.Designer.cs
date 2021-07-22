@@ -99,6 +99,15 @@ namespace Mesawer.InfrastructureLayer.Resources {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
+        public static string TooSoonForNewToken {
+            get {
+                return ResourceManager.GetString("TooSoonForNewToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
         public static string UnauthorizedDevice {
             get {
                 return ResourceManager.GetString("UnauthorizedDevice", resourceCulture);

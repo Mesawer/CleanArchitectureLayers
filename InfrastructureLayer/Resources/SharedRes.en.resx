@@ -132,4 +132,7 @@
   <data name="UnauthorizedDevice" xml:space="preserve">
     <value>This device isn't registered to this user</value>
   </data>
+  <data name="TooSoonForNewToken" xml:space="preserve">
+    <value>It's too soon to request another token</value>
+  </data>
 </root>
