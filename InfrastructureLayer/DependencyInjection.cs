@@ -188,6 +188,7 @@ namespace Mesawer.InfrastructureLayer
                 config.NumericVerificationToken = options.IdentityOptions.NumericVerificationToken;
                 config.SessionExpirationPeriod  = options.IdentityOptions.SessionExpirationPeriod;
                 config.TokenExpirationPeriod    = options.IdentityOptions.TokenExpirationPeriod;
+                config.TokenResetPeriod         = options.IdentityOptions.TokenResetPeriod;
             });
 
             services.Configure<JwtConfig>(config =>
