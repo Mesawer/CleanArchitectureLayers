@@ -31,6 +31,7 @@ namespace Mesawer.PresentationLayer.Filters
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(BadRequestException), HandleBadRequestException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
+                { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(UnhandledRequestException), HandleUnhandledRequestException },
             };
         }
@@ -103,6 +104,13 @@ namespace Mesawer.PresentationLayer.Filters
         private static void HandleForbiddenAccessException(ExceptionContext context)
         {
             context.Result = new ForbidResult();
+
+            context.ExceptionHandled = true;
+        }
+
+        private static void HandleUnauthorizedAccessException(ExceptionContext context)
+        {
+            context.Result = new UnauthorizedResult();
 
             context.ExceptionHandled = true;
         }
