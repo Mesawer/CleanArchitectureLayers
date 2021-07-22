@@ -101,16 +101,17 @@ namespace Mesawer.ApplicationLayer.Extensions
         {
             var contentTypes = fileType switch
             {
-                FileType.Picture  => new[] { "jpg", "jpeg", "png" },
-                FileType.Audio    => new[] { "mp3" },
-                FileType.Video    => new[] { "mp4" },
-                FileType.Pdf      => new[] { "pdf" },
-                FileType.Document => new[] { "pdf" },
-                FileType.Text     => new[] { "txt" },
-                FileType.Xml      => new[] { "xml" },
-                FileType.Html     => new[] { "html" },
-                FileType.Svg      => new[] { "svg" },
-                _                 => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
+                FileType.Picture   => new[] { "jpg", "jpeg", "png" },
+                FileType.Audio     => new[] { "mp3" },
+                FileType.Video     => new[] { "mp4" },
+                FileType.Pdf       => new[] { "pdf" },
+                FileType.Document  => new[] { "pdf" },
+                FileType.Text      => new[] { "txt" },
+                FileType.Xml       => new[] { "xml" },
+                FileType.Html      => new[] { "html" },
+                FileType.Svg       => new[] { "svg" },
+                FileType.Utilities => new[] { "*/*" },
+                _                  => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
             };
 
             return builder.ContentTypes(contentTypes);

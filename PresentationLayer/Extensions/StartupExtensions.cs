@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire;
 using Hangfire.Dashboard;
+using Mesawer.ApplicationLayer;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.InfrastructureLayer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Serilog;
 
 namespace Mesawer.PresentationLayer.Extensions
@@ -81,8 +83,11 @@ namespace Mesawer.PresentationLayer.Extensions
 
         public static void MapEndpoints(
             this IApplicationBuilder app,
-            Func<IEnumerable<IDashboardAuthorizationFilter>> hangfireAuthorizationFilters)
-            => app.UseEndpoints(endpoints =>
+            Func<IEnumerable<IDashboardAuthorizationFilter>> hangfireAuthorizationFilters,
+            bool useSpa = false,
+            bool useProxy = false)
+        {
+            app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
 
@@ -97,5 +102,33 @@ namespace Mesawer.PresentationLayer.Extensions
                     }
                 );
             });
+
+            if (useSpa)
+                app.UseSpa(spa =>
+                {
+                    // To learn more about options for serving an Angular SPA from ASP.NET Core,
+                    // see https://go.microsoft.com/fwlink/?linkid=864501
+                    spa.Options.SourcePath = "ClientApp";
+
+                    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                    {
+                        OnPrepareResponse = context =>
+                        {
+                            var headers = context.Context.Response.Headers;
+
+                            headers[HeaderNames.CacheControl] =
+                                "no-cache, no-store, must-revalidate"; // HTTP 1.1
+
+                            headers[HeaderNames.Pragma]  = "no-cache"; // HTTP 1.0
+                            headers[HeaderNames.Expires] = "-1";       // Proxies
+                            headers.Remove(HeaderNames.ETag);          // Proxies
+                        }
+                    };
+
+                    if (useProxy)
+                        spa.UseProxyToSpaDevelopmentServer(
+                            Environment.GetEnvironmentVariable(Constants.SpaProxyBaseUrlName));
+                });
+        }
     }
 }

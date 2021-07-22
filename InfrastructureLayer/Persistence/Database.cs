@@ -9,16 +9,29 @@ namespace Mesawer.InfrastructureLayer.Persistence
     public static class Database
     {
         public const string DateTimeOffset = "datetimeoffset";
+        public const string Date           = "date";
 
         public static void OwnsFullName<TEntity>(
             this EntityTypeBuilder<TEntity> entity,
             Expression<Func<TEntity, FullName>> navigationExpression) where TEntity : class
             => entity.OwnsOne(navigationExpression, FullNameTypeBuilder);
 
+        public static void OwnsFullName<TEntity, TDependentEntity>(
+            this OwnedNavigationBuilder<TEntity, TDependentEntity> entity,
+            Expression<Func<TDependentEntity, FullName>> navigationExpression)
+            where TEntity : class where TDependentEntity : class
+            => entity.OwnsOne(navigationExpression, FullNameTypeBuilder);
+
         public static void OwnsLocalizedString<TEntity>(
             this EntityTypeBuilder<TEntity> entity,
             Expression<Func<TEntity, LocalizedString>> navigationExpression,
             int maxLength = NameMaxLength) where TEntity : class
+            => entity.OwnsOne(navigationExpression, c => LocalizedNameTypeBuilder(c, maxLength));
+
+        public static void OwnsLocalizedString<TEntity, TDependentEntity>(
+            this OwnedNavigationBuilder<TEntity, TDependentEntity> entity,
+            Expression<Func<TDependentEntity, LocalizedString>> navigationExpression,
+            int maxLength = NameMaxLength) where TEntity : class where TDependentEntity : class
             => entity.OwnsOne(navigationExpression, c => LocalizedNameTypeBuilder(c, maxLength));
 
         private static void FullNameTypeBuilder<TEntity>(OwnedNavigationBuilder<TEntity, FullName> builder)

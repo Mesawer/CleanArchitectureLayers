@@ -109,7 +109,7 @@ namespace Mesawer.InfrastructureLayer
                     opts.ClaimsIdentity.RoleClaimType     = AppClaims.Roles;
                     opts.ClaimsIdentity.UserNameClaimType = AppClaims.UserName;
                     opts.SignIn.RequireConfirmedAccount   = true;
-                    opts.User.RequireUniqueEmail          = true;
+                    opts.User.RequireUniqueEmail          = options.IdentityOptions.RequireUniqueEmail;
                     opts.Password.RequiredLength          = options.IdentityOptions.Password.RequiredLength;
                     opts.Password.RequireNonAlphanumeric  = options.IdentityOptions.Password.RequireNonAlphanumeric;
                     opts.Password.RequireLowercase        = options.IdentityOptions.Password.RequireLowercase;
@@ -119,6 +119,7 @@ namespace Mesawer.InfrastructureLayer
                     opts.Lockout.DefaultLockoutTimeSpan   = TimeSpan.FromMinutes(5);
                 })
                 .AddRoles<IdentityRole>()
+                .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
                 .AddEntityFrameworkStores<TContext>()
                 .AddDefaultTokenProviders();
 

@@ -3,6 +3,7 @@ using System.Linq;
 using FluentValidation.AspNetCore;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.PresentationLayer.Filters;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -24,6 +25,7 @@ namespace Mesawer.PresentationLayer
             configureOptions(options);
 
             services.AddCors(options);
+            services.ConfigureLocalization();
             services.ConfigureDocs(options);
             services.ConfigureMvcApi();
 
@@ -48,6 +50,18 @@ namespace Mesawer.PresentationLayer
                             .WithOrigins(value)
                             .AllowCredentials());
                 }));
+
+        public static void ConfigureLocalization(this IServiceCollection services)
+            => services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[]
+                {
+                    "en", "ar"
+                };
+                options.SetDefaultCulture(supportedCultures[0])
+                    .AddSupportedCultures(supportedCultures)
+                    .AddSupportedUICultures(supportedCultures);
+            });
 
         private static void ConfigureDocs(
             this IServiceCollection services,

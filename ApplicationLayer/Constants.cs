@@ -5,6 +5,7 @@ namespace Mesawer.ApplicationLayer
         #region General
 
         public const string EnvironmentVariableName = "DOTNET_ENVIRONMENT";
+        public const string SpaProxyBaseUrlName = "SPA_BASE_URL";
 
         public const int MaxUrlLength = 65519;
 

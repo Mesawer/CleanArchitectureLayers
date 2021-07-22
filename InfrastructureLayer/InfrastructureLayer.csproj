@@ -10,7 +10,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>mesawer, application, layer, tiers, extensions, helpers</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>1.1.4</Version>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\Identity\IdentityRes.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IdentityRes.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\SharedRes.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -41,6 +47,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Identity\IdentityRes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>IdentityRes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\SharedRes.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SharedRes.Designer.cs</LastGenOutput>

@@ -105,11 +105,12 @@ namespace Mesawer.InfrastructureLayer.Identity
 
             var logins = (await _identityManager.UserManager.GetLoginsAsync(user)).ToList();
 
-            if (logins.All(c => !string.Equals(c.LoginProvider,
-                loginProvider.ToString(),
-                StringComparison.CurrentCultureIgnoreCase)))
-                throw new BadRequestException(SharedRes.InvalidLogin);
+            //if (logins.All(c => !string.Equals(c.LoginProvider,
+            //    loginProvider.ToString(),
+            //    StringComparison.CurrentCultureIgnoreCase)))
+            //    throw new BadRequestException(SharedRes.InvalidLogin);
 
+            // Add the social user if it doesn't exist, since it belongs to this user
             if (logins.All(c => c.ProviderKey != socialUser.Id))
             {
                 var result =

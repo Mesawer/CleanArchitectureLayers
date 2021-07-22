@@ -28,6 +28,11 @@ namespace Mesawer.InfrastructureLayer.Models
         public int SessionExpirationPeriod { get; set; } = 24;
 
         /// <summary>
+        /// Determines whether the application requires unique emails for its users
+        /// </summary>
+        public bool RequireUniqueEmail { get; set; } = true;
+
+        /// <summary>
         /// The period after which the generated token will be expired (in minutes)
         /// </summary>
         public int TokenExpirationPeriod { get; set; } = 60;
