@@ -105,18 +105,19 @@ namespace Mesawer.InfrastructureLayer
 
             services.AddIdentity<TUser, IdentityRole>(opts =>
                 {
-                    opts.ClaimsIdentity.UserIdClaimType   = AppClaims.Id;
-                    opts.ClaimsIdentity.RoleClaimType     = AppClaims.Roles;
-                    opts.ClaimsIdentity.UserNameClaimType = AppClaims.UserName;
-                    opts.SignIn.RequireConfirmedAccount   = true;
-                    opts.User.RequireUniqueEmail          = options.IdentityOptions.RequireUniqueEmail;
-                    opts.Password.RequiredLength          = options.IdentityOptions.Password.RequiredLength;
-                    opts.Password.RequireNonAlphanumeric  = options.IdentityOptions.Password.RequireNonAlphanumeric;
-                    opts.Password.RequireLowercase        = options.IdentityOptions.Password.RequireLowercase;
-                    opts.Password.RequireUppercase        = options.IdentityOptions.Password.RequireUppercase;
-                    opts.Password.RequireDigit            = options.IdentityOptions.Password.RequireDigit;
-                    opts.Lockout.MaxFailedAccessAttempts  = 5;
-                    opts.Lockout.DefaultLockoutTimeSpan   = TimeSpan.FromMinutes(5);
+                    opts.ClaimsIdentity.UserIdClaimType     = AppClaims.Id;
+                    opts.ClaimsIdentity.RoleClaimType       = AppClaims.Roles;
+                    opts.ClaimsIdentity.UserNameClaimType   = AppClaims.UserName;
+                    opts.SignIn.RequireConfirmedEmail       = options.IdentityOptions.RequireConfirmedEmail;
+                    opts.SignIn.RequireConfirmedPhoneNumber = options.IdentityOptions.RequireConfirmedPhoneNumber;
+                    opts.User.RequireUniqueEmail            = options.IdentityOptions.RequireUniqueEmail;
+                    opts.Password.RequiredLength            = options.IdentityOptions.Password.RequiredLength;
+                    opts.Password.RequireNonAlphanumeric    = options.IdentityOptions.Password.RequireNonAlphanumeric;
+                    opts.Password.RequireLowercase          = options.IdentityOptions.Password.RequireLowercase;
+                    opts.Password.RequireUppercase          = options.IdentityOptions.Password.RequireUppercase;
+                    opts.Password.RequireDigit              = options.IdentityOptions.Password.RequireDigit;
+                    opts.Lockout.MaxFailedAccessAttempts    = 5;
+                    opts.Lockout.DefaultLockoutTimeSpan     = TimeSpan.FromMinutes(5);
                 })
                 .AddRoles<IdentityRole>()
                 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()

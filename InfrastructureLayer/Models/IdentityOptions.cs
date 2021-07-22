@@ -28,6 +28,16 @@ namespace Mesawer.InfrastructureLayer.Models
         public int SessionExpirationPeriod { get; set; } = 24;
 
         /// <summary>
+        /// Determines whether a confirmed email address is required to sign in
+        /// </summary>
+        public bool RequireConfirmedEmail { get; set; } = true;
+
+        /// <summary>
+        /// Determines whether a confirmed phone number is required to sign in
+        /// </summary>
+        public bool RequireConfirmedPhoneNumber { get; set; } = false;
+
+        /// <summary>
         /// Determines whether the application requires unique emails for its users
         /// </summary>
         public bool RequireUniqueEmail { get; set; } = true;
