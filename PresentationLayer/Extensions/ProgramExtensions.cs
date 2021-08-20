@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Mesawer.ApplicationLayer;
 using Mesawer.ApplicationLayer.Interfaces;
-using Mesawer.ApplicationLayer.Models;
 using Mesawer.DomainLayer.Entities;
 using Mesawer.InfrastructureLayer.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -40,12 +39,10 @@ namespace Mesawer.PresentationLayer.Extensions
             return hostBuilder.UseSerilog();
         }
 
-        public static async Task<IHost> MigrateDatabase<TProgram, TContext, TUser, TSession>(
+        public static async Task<IHost> MigrateDatabase<TProgram, TContext>(
             this IHost host,
-            Func<IIdentityManager<TUser>, TContext, Task> seedFunc)
-            where TContext : ApplicationDbContext<TUser, TSession>
-            where TUser : ApplicationUser
-            where TSession : Session
+            Func<IServiceProvider, Task> seedFunc)
+            where TContext : DbContext
         {
             using var scope    = host.Services.CreateScope();
             var       services = scope.ServiceProvider;
@@ -63,9 +60,7 @@ namespace Mesawer.PresentationLayer.Extensions
                     await context.Database.MigrateAsync();
                 }
 
-                var identityManager = services.GetRequiredService<IIdentityManager<TUser>>();
-
-                await seedFunc(identityManager, context);
+                await seedFunc(services);
             }
             catch (Exception ex)
             {

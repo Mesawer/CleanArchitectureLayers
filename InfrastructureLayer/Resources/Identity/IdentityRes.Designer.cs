@@ -22,7 +22,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class IdentityRes {
+    public class IdentityRes {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Mesawer.InfrastructureLayer.Resources.Identity.IdentityRes", typeof(IdentityRes).Assembly);
@@ -51,7 +51,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string ConcurrencyFailure {
+        public static string ConcurrencyFailure {
             get {
                 return ResourceManager.GetString("ConcurrencyFailure", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string DefaultIdentityError {
+        public static string DefaultIdentityError {
             get {
                 return ResourceManager.GetString("DefaultIdentityError", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string DuplicateEmail {
+        public static string DuplicateEmail {
             get {
                 return ResourceManager.GetString("DuplicateEmail", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string DuplicateRoleName {
+        public static string DuplicateRoleName {
             get {
                 return ResourceManager.GetString("DuplicateRoleName", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string DuplicateUserName {
+        public static string DuplicateUserName {
             get {
                 return ResourceManager.GetString("DuplicateUserName", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string InvalidEmail {
+        public static string InvalidEmail {
             get {
                 return ResourceManager.GetString("InvalidEmail", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string InvalidRoleName {
+        public static string InvalidRoleName {
             get {
                 return ResourceManager.GetString("InvalidRoleName", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string InvalidToken {
+        public static string InvalidToken {
             get {
                 return ResourceManager.GetString("InvalidToken", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string InvalidUserName {
+        public static string InvalidUserName {
             get {
                 return ResourceManager.GetString("InvalidUserName", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string LoginAlreadyAssociated {
+        public static string LoginAlreadyAssociated {
             get {
                 return ResourceManager.GetString("LoginAlreadyAssociated", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordMismatch {
+        public static string PasswordMismatch {
             get {
                 return ResourceManager.GetString("PasswordMismatch", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordRequiresDigit {
+        public static string PasswordRequiresDigit {
             get {
                 return ResourceManager.GetString("PasswordRequiresDigit", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordRequiresLower {
+        public static string PasswordRequiresLower {
             get {
                 return ResourceManager.GetString("PasswordRequiresLower", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordRequiresNonAlphanumeric {
+        public static string PasswordRequiresNonAlphanumeric {
             get {
                 return ResourceManager.GetString("PasswordRequiresNonAlphanumeric", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordRequiresUniqueChars {
+        public static string PasswordRequiresUniqueChars {
             get {
                 return ResourceManager.GetString("PasswordRequiresUniqueChars", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordRequiresUpper {
+        public static string PasswordRequiresUpper {
             get {
                 return ResourceManager.GetString("PasswordRequiresUpper", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string PasswordTooShort {
+        public static string PasswordTooShort {
             get {
                 return ResourceManager.GetString("PasswordTooShort", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string RecoveryCodeRedemptionFailed {
+        public static string RecoveryCodeRedemptionFailed {
             get {
                 return ResourceManager.GetString("RecoveryCodeRedemptionFailed", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string UserAlreadyHasPassword {
+        public static string UserAlreadyHasPassword {
             get {
                 return ResourceManager.GetString("UserAlreadyHasPassword", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string UserAlreadyInRole {
+        public static string UserAlreadyInRole {
             get {
                 return ResourceManager.GetString("UserAlreadyInRole", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string UserLockoutNotEnabled {
+        public static string UserLockoutNotEnabled {
             get {
                 return ResourceManager.GetString("UserLockoutNotEnabled", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace Mesawer.InfrastructureLayer.Resources.Identity {
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        internal static string UserNotInRole {
+        public static string UserNotInRole {
             get {
                 return ResourceManager.GetString("UserNotInRole", resourceCulture);
             }

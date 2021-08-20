@@ -1,3 +1,5 @@
+using Mesawer.ApplicationLayer.Enums;
+
 namespace Mesawer.InfrastructureLayer.Models
 {
     public class IdentityOptions
@@ -22,6 +24,8 @@ namespace Mesawer.InfrastructureLayer.Models
         /// </summary>
         public bool NumericVerificationToken { get; set; } = false;
 
+        public int NumericTokenLength { get; set; } = 6;
+
         /// <summary>
         /// The period after which the generated session will be expired (in hours)
         /// </summary>
@@ -43,6 +47,11 @@ namespace Mesawer.InfrastructureLayer.Models
         public bool RequireUniqueEmail { get; set; } = true;
 
         /// <summary>
+        /// Determines whether the application will lockout the user after several failed attempts
+        /// </summary>
+        public bool LockoutOnFailure { get; set; } = true;
+
+        /// <summary>
         /// The period after which the generated token will be expired (in minutes)
         /// </summary>
         public int TokenExpirationPeriod { get; set; } = 60;
@@ -51,6 +60,8 @@ namespace Mesawer.InfrastructureLayer.Models
         /// The period before which the user can't generate another token (in minutes)
         /// </summary>
         public int TokenResetPeriod { get; set; } = 5;
+
+        public PhoneNumberCode[] AcceptedCodes { get; set; }
 
         private PasswordOptions _password = new();
 

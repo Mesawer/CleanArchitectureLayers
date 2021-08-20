@@ -55,8 +55,8 @@ namespace Mesawer.InfrastructureLayer
         public Type StorageLocationService { get; set; } = typeof(LocalStorageLocationService);
         public Type StorageService { get; set; } = typeof(LocalStorageService);
 
-        internal bool IsDevelopment => _environmentName == Environments.Development;
-        internal bool IsStaging => _environmentName == Environments.Staging;
-        internal bool IsProduction => _environmentName == Environments.Production;
+        public bool IsDevelopment => _environmentName == Environments.Development;
+        public bool IsStaging => _environmentName == Environments.Staging;
+        public bool IsProduction => _environmentName == Environments.Production;
     }
 }

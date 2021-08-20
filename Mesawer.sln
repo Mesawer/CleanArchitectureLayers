@@ -12,11 +12,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainLayer", "DomainLayer\DomainLayer.csproj", "{7B08620F-4D2D-4B09-8C64-7514D681B73E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainLayer", "DomainLayer\DomainLayer.csproj", "{7B08620F-4D2D-4B09-8C64-7514D681B73E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureLayer", "InfrastructureLayer\InfrastructureLayer.csproj", "{6ABCECF5-4B23-4B24-8C4B-DC4D9EC32624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureLayer", "InfrastructureLayer\InfrastructureLayer.csproj", "{6ABCECF5-4B23-4B24-8C4B-DC4D9EC32624}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DomainLayer.CustomIdentity", "DomainLayer.CustomIdentity\DomainLayer.CustomIdentity.csproj", "{03BA6957-67A4-4D84-9D02-943E5F45F426}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainLayer.AspNetCore.Identity", "DomainLayer.AspNetCore.Identity\DomainLayer.AspNetCore.Identity.csproj", "{6173B9DA-081C-463F-85AD-BF42BC879749}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationLayer.AspNetCore.Identity", "ApplicationLayer.AspNetCore.Identity\ApplicationLayer.AspNetCore.Identity.csproj", "{075DA341-EA46-44B6-9F49-70D4CCBA3BA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationLayer.CustomIdentity", "ApplicationLayer.CustomIdentity\ApplicationLayer.CustomIdentity.csproj", "{C83392CE-A436-400B-8F00-2F4C79B4120E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureLayer.AspNetCore.Identity", "InfrastructureLayer.AspNetCore.Identity\InfrastructureLayer.AspNetCore.Identity.csproj", "{A3880522-60AF-4749-8B0B-4273D11CCD05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureLayer.CustomIdentity", "InfrastructureLayer.CustomIdentity\InfrastructureLayer.CustomIdentity.csproj", "{11CE86DE-11EB-4E6E-891B-546BDBBA8F0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +52,30 @@ Global
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03BA6957-67A4-4D84-9D02-943E5F45F426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03BA6957-67A4-4D84-9D02-943E5F45F426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03BA6957-67A4-4D84-9D02-943E5F45F426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03BA6957-67A4-4D84-9D02-943E5F45F426}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6173B9DA-081C-463F-85AD-BF42BC879749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6173B9DA-081C-463F-85AD-BF42BC879749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6173B9DA-081C-463F-85AD-BF42BC879749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6173B9DA-081C-463F-85AD-BF42BC879749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{075DA341-EA46-44B6-9F49-70D4CCBA3BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{075DA341-EA46-44B6-9F49-70D4CCBA3BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{075DA341-EA46-44B6-9F49-70D4CCBA3BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{075DA341-EA46-44B6-9F49-70D4CCBA3BA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C83392CE-A436-400B-8F00-2F4C79B4120E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83392CE-A436-400B-8F00-2F4C79B4120E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C83392CE-A436-400B-8F00-2F4C79B4120E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C83392CE-A436-400B-8F00-2F4C79B4120E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3880522-60AF-4749-8B0B-4273D11CCD05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3880522-60AF-4749-8B0B-4273D11CCD05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3880522-60AF-4749-8B0B-4273D11CCD05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3880522-60AF-4749-8B0B-4273D11CCD05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11CE86DE-11EB-4E6E-891B-546BDBBA8F0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CE86DE-11EB-4E6E-891B-546BDBBA8F0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CE86DE-11EB-4E6E-891B-546BDBBA8F0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CE86DE-11EB-4E6E-891B-546BDBBA8F0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

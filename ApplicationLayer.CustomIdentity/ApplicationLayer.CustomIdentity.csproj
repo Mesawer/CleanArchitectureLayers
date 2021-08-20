@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Mesawer.ApplicationLayer.CustomIdentity</RootNamespace>
+    <PackageId>Mesawer.ApplicationLayer.CustomIdentity</PackageId>
+    <Authors>Mesawer</Authors>
+    <Product />
+    <Description>This library contains all the required reusable components in the application layer.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>mesawer, application, layer, tiers, extensions, helpers</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.2.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApplicationLayer\ApplicationLayer.csproj" />
+    <ProjectReference Include="..\DomainLayer.CustomIdentity\DomainLayer.CustomIdentity.csproj" />
+    <ProjectReference Include="..\DomainLayer\DomainLayer.csproj" />
+  </ItemGroup>
+
+</Project>

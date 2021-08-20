@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Mesawer.DomainLayer.CustomIdentity</RootNamespace>
+    <PackageId>Mesawer.DomainLayer.CustomIdentity</PackageId>
+    <Authors>Mesawer</Authors>
+    <Product />
+    <Description>This library contains all the required reusable components for custom identity in the domain layer.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>mesawer, domain, layer, tiers, extensions, helpers, identity, custom</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.2.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DomainLayer\DomainLayer.csproj" />
+  </ItemGroup>
+
+</Project>

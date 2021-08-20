@@ -5,19 +5,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mesawer.ApplicationLayer.Interfaces;
-using Mesawer.ApplicationLayer.Models;
 using Mesawer.DomainLayer.Entities;
 using Mesawer.DomainLayer.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Mesawer.InfrastructureLayer.Persistence
 {
-    public class ApplicationDbContext<TUser, TSession> : IdentityDbContext<TUser>, IDbContext<TSession>
-        where TUser : ApplicationUser
-        where TSession : Session
+    public class ApplicationDbContext<TSession> : DbContext, IDbContext<TSession> where TSession : Session
     {
         private readonly IApplicationUserService _currentUserService;
         private readonly IDateTime               _dateTime;
@@ -75,9 +70,9 @@ namespace Mesawer.InfrastructureLayer.Persistence
         {
             var tasks = GetDomainEventHandlersAsTasks(domainEvents);
 
-            if (tasks.Any()) _backgroundJob.Enqueue(() => FireAndForget(tasks));
+            //if (tasks.Any()) _backgroundJob.Enqueue(() => FireAndForget(tasks));
 
-            return Task.CompletedTask;
+            return FireAndForget(tasks);
         }
 
         public static Task FireAndForget(IEnumerable<Task> tasks) => Task.WhenAll(tasks);
@@ -137,18 +132,9 @@ namespace Mesawer.InfrastructureLayer.Persistence
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new SessionConfiguration<TSession>());
-            builder.ApplyConfiguration(new UserConfiguration<TUser>());
-
-            builder.Entity<TUser>().ToTable("IdentityUsers");
-            builder.Entity<IdentityRole>().ToTable("IdentityRoles");
-            builder.Entity<IdentityRoleClaim<string>>().ToTable("IdentityRoleClaims");
-            builder.Entity<IdentityUserRole<string>>().ToTable("IdentityUserRoles");
-            builder.Entity<IdentityUserClaim<string>>().ToTable("IdentityUserClaims");
-            builder.Entity<IdentityUserLogin<string>>().ToTable("IdentityUserLogins");
-            builder.Entity<IdentityUserToken<string>>().ToTable("IdentityUserTokens");
         }
 
-        private List<Task> GetDomainEventHandlersAsTasks(params DomainEvent[] domainEvents)
+        private IEnumerable<Task> GetDomainEventHandlersAsTasks(params DomainEvent[] domainEvents)
         {
             var events = ChangeTracker
                 .Entries<IHasDomainEvent>()
