@@ -8,7 +8,7 @@ namespace Mesawer.ApplicationLayer.CustomIdentity.Interfaces
 {
     public interface IIdentityDbContext<TUser, TAccount, TSession, TRole> : IDbContext<TSession>
         where TUser : ApplicationUser
-        where TAccount : Account<TUser, TSession, TRole>
+        where TAccount : Account<TUser, TRole>
         where TSession : Session
         where TRole : Enum
     {

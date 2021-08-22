@@ -154,7 +154,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             session = new TSession
             {
-                Id         = Guid.NewGuid().ToString("N"),
+                UserId     = userId,
                 MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
                 LastLogin  = _dateTime.Now
             };

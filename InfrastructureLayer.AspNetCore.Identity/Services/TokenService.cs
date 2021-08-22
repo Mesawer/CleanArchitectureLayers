@@ -27,7 +27,7 @@ using Newtonsoft.Json;
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 {
     public class TokenService<TUser, TAccount, TSession> : ITokenService<TUser>
-        where TUser : ApplicationUser where TAccount : Account<TUser, TSession> where TSession : Session
+        where TUser : ApplicationUser where TAccount : Account<TUser> where TSession : Session
     {
         private const string GoogleTokenInfoEndpoint =
             "https://oauth2.googleapis.com/tokeninfo?id_token={0}";
@@ -38,12 +38,12 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         private const string GoogleLoginProvider   = "google";
         private const string FacebookLoginProvider = "facebook";
 
-        private readonly IIdentityManager<TUser, TAccount, TSession> _identityManager;
-        private readonly IHostEnvironment                            _env;
-        private readonly JwtConfig                                   _jwtConfig;
+        private readonly IIdentityManager<TUser> _identityManager;
+        private readonly IHostEnvironment        _env;
+        private readonly JwtConfig               _jwtConfig;
 
         public TokenService(
-            IIdentityManager<TUser, TAccount, TSession> identityManager,
+            IIdentityManager<TUser> identityManager,
             IOptionsMonitor<JwtConfig> config,
             IHostEnvironment env)
         {

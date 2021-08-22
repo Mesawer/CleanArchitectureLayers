@@ -18,9 +18,18 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
 {
     public class IdentityDbContext<TUser, TAccount, TSession>
-        : IdentityDbContext<TUser>, IIdentityDbContext<TUser, TAccount, TSession>
+        : IdentityDbContext<
+                TUser,
+                IdentityRole,
+                string,
+                IdentityUserClaim<string>,
+                TAccount,
+                IdentityUserLogin<string>,
+                IdentityRoleClaim<string>,
+                IdentityUserToken<string>>,
+            IIdentityDbContext<TUser, TAccount, TSession>
         where TUser : ApplicationUser
-        where TAccount : Account<TUser, TSession>
+        where TAccount : Account<TUser>
         where TSession : Session
     {
         private readonly IApplicationUserService _currentUserService;
@@ -141,9 +150,9 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new AccountConfiguration<TUser, TAccount, TSession>());
+            builder.ApplyConfiguration(new AccountConfiguration<TUser, TAccount>());
             builder.ApplyConfiguration(new SessionConfiguration<TSession>());
-            builder.ApplyConfiguration(new UserConfiguration<TUser>());
+            builder.ApplyConfiguration(new UserConfiguration<TUser, TSession>());
 
             builder.Entity<TUser>().ToTable("IdentityUsers");
             builder.Entity<TAccount>().ToTable("IdentityAccounts");

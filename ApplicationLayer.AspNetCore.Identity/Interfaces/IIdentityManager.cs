@@ -1,11 +1,9 @@
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
-using Mesawer.DomainLayer.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces
 {
-    public interface IIdentityManager<TUser, TAccount, TSession>
-        where TUser : ApplicationUser where TAccount : Account<TUser, TSession> where TSession : Session
+    public interface IIdentityManager<TUser> where TUser : ApplicationUser
     {
         public SignInManager<TUser> SignInManager { get; }
         public UserManager<TUser> UserManager { get; }

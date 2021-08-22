@@ -26,7 +26,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity
             where TIDbContext : class, IIdentityDbContext<TUser, TAccount, TSession, TRole>
             where TContext : ApplicationDbContext<TUser, TAccount, TSession, TRole>, TIDbContext
             where TUser : ApplicationUser
-            where TAccount : Account<TUser, TSession, TRole>
+            where TAccount : Account<TUser, TRole>
             where TSession : Session, new()
             where TRole : Enum
         {
@@ -54,7 +54,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity
             this IServiceCollection services,
             InfrastructureOptions options)
             where TUser : ApplicationUser
-            where TAccount : Account<TUser, TSession, TRole>
+            where TAccount : Account<TUser, TRole>
             where TSession : Session, new()
             where TRole : Enum
         {

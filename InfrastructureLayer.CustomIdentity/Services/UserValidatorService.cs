@@ -20,7 +20,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity.Services
 {
     public class UserValidatorService<TUser, TAccount, TSession, TRole> : IUserValidatorService
         where TUser : ApplicationUser
-        where TAccount : Account<TUser, TSession, TRole>
+        where TAccount : Account<TUser, TRole>
         where TSession : Session, new()
         where TRole : Enum
     {
@@ -158,7 +158,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity.Services
 
             session = new TSession
             {
-                Id         = Guid.NewGuid().ToString("N"),
+                UserId     = userId,
                 MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
                 LastLogin  = _dateTime.Now
             };

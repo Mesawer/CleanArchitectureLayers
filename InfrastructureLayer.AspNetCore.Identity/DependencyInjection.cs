@@ -28,7 +28,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
             where TIDbContext : class, IIdentityDbContext<TUser, TAccount, TSession>
             where TContext : IdentityDbContext<TUser, TAccount, TSession>, TIDbContext
             where TUser : ApplicationUser
-            where TAccount : Account<TUser, TSession>
+            where TAccount : Account<TUser>
             where TSession : Session, new()
         {
             infraCollection.Services.AddDbContext<TContext>(
@@ -56,7 +56,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
             InfrastructureOptions options)
             where TContext : IdentityDbContext<TUser, TAccount, TSession>
             where TUser : ApplicationUser
-            where TAccount : Account<TUser, TSession>
+            where TAccount : Account<TUser>
             where TSession : Session, new()
         {
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
@@ -136,7 +136,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
             services.AddScoped<ITokenValidatorService, TokenValidatorService>();
             services.AddScoped<IUserValidatorService, UserValidatorService<TSession>>();
             services
-                .AddScoped<IIdentityManager<TUser, TAccount, TSession>, IdentityManager<TUser, TAccount, TSession>>();
+                .AddScoped<IIdentityManager<TUser>, IdentityManager<TUser>>();
 
             services.AddSingleton<IApplicationUserService, ApplicationUserService>();
 

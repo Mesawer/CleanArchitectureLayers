@@ -4,17 +4,13 @@ using System.Text.RegularExpressions;
 using Mesawer.ApplicationLayer;
 using Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
-using Mesawer.DomainLayer.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using IdentityOptions = Mesawer.InfrastructureLayer.Models.IdentityOptions;
 
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 {
-    public class IdentityManager<TUser, TAccount, TSession> : IIdentityManager<TUser, TAccount, TSession>
-        where TUser : ApplicationUser
-        where TAccount : Account<TUser, TSession>
-        where TSession : Session
+    public class IdentityManager<TUser> : IIdentityManager<TUser> where TUser : ApplicationUser
     {
         private readonly IdentityOptions _identityOptions;
 

@@ -18,7 +18,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity.Persistence
     public class ApplicationDbContext<TUser, TAccount, TSession, TRole>
         : DbContext, IIdentityDbContext<TUser, TAccount, TSession, TRole>
         where TUser : ApplicationUser
-        where TAccount : Account<TUser, TSession, TRole>
+        where TAccount : Account<TUser, TRole>
         where TSession : Session
         where TRole : Enum
     {
