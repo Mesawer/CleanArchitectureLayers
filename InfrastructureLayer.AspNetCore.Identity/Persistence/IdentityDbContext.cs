@@ -17,7 +17,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
 {
-    public class IdentityDbContext<TUser, TAccount, TSession> : IdentityDbContext<TUser>, IIdentityDbContext<TUser, TAccount, TSession>
+    public class IdentityDbContext<TUser, TAccount, TSession>
+        : IdentityDbContext<TUser>, IIdentityDbContext<TUser, TAccount, TSession>
         where TUser : ApplicationUser
         where TAccount : Account<TUser, TSession>
         where TSession : Session
@@ -40,7 +41,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
             _backgroundJob      = backgroundJob;
             _dateTime           = dateTime;
         }
-        
+
         public DbSet<TAccount> Accounts => Set<TAccount>();
         public DbSet<TSession> Sessions => Set<TSession>();
 
@@ -140,13 +141,14 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new AccountConfiguration<TUser, TAccount, TSession>());
             builder.ApplyConfiguration(new SessionConfiguration<TSession>());
             builder.ApplyConfiguration(new UserConfiguration<TUser>());
 
             builder.Entity<TUser>().ToTable("IdentityUsers");
+            builder.Entity<TAccount>().ToTable("IdentityAccounts");
             builder.Entity<IdentityRole>().ToTable("IdentityRoles");
             builder.Entity<IdentityRoleClaim<string>>().ToTable("IdentityRoleClaims");
-            builder.Entity<IdentityUserRole<string>>().ToTable("IdentityUserRoles");
             builder.Entity<IdentityUserClaim<string>>().ToTable("IdentityUserClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("IdentityUserLogins");
             builder.Entity<IdentityUserToken<string>>().ToTable("IdentityUserTokens");

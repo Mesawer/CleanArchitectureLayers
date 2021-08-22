@@ -21,7 +21,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         public IdentityManager(
             SignInManager<TUser> singInManager,
             UserManager<TUser> userManager,
-            RoleManager<TAccount> roleManager,
+            RoleManager<IdentityRole> roleManager,
             ITokenGeneratorService<TUser> tokenGenerator,
             ITokenValidatorService tokenValidator,
             IUserValidatorService userValidator,
@@ -38,7 +38,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
         public SignInManager<TUser> SignInManager { get; }
         public UserManager<TUser> UserManager { get; }
-        public RoleManager<TAccount> RoleManager { get; }
+        public RoleManager<IdentityRole> RoleManager { get; }
         public ITokenGeneratorService<TUser> TokenGenerator { get; }
         public ITokenValidatorService TokenValidator { get; }
         public IUserValidatorService UserValidator { get; }

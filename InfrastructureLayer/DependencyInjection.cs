@@ -2,6 +2,7 @@ using System;
 using Hangfire;
 using Hangfire.SqlServer;
 using Mesawer.ApplicationLayer.Interfaces;
+using Mesawer.InfrastructureLayer.Interfaces;
 using Mesawer.InfrastructureLayer.Models;
 using Mesawer.InfrastructureLayer.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,19 +12,23 @@ namespace Mesawer.InfrastructureLayer
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection ConfigureInfrastructureLayer(
+        public static IInfrastructureServiceCollection ConfigureInfrastructureLayer(
             this IServiceCollection services,
             Action<InfrastructureOptions> configureOptions)
         {
             var options = new InfrastructureOptions();
 
             configureOptions(options);
-            
+
             services.ConfigureHangfire(options.ConnectionString);
             services.ConfigureServices(options);
             services.ConfigureEmails(options);
 
-            return services;
+            return new InfrastructureServiceCollection
+            {
+                Services = services,
+                Options  = options
+            };
         }
 
         private static void ConfigureHangfire(this IServiceCollection services, string connection)

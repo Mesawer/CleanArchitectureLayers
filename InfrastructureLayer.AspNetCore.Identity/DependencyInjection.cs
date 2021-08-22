@@ -8,6 +8,7 @@ using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
 using Mesawer.DomainLayer.Entities;
 using Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence;
 using Mesawer.InfrastructureLayer.AspNetCore.Identity.Services;
+using Mesawer.InfrastructureLayer.Interfaces;
 using Mesawer.InfrastructureLayer.Models;
 using Mesawer.InfrastructureLayer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,41 +16,41 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using LocalizedIdentityErrorDescriber = Mesawer.InfrastructureLayer.AspNetCore.Identity.Services.LocalizedIdentityErrorDescriber;
+using LocalizedIdentityErrorDescriber =
+    Mesawer.InfrastructureLayer.AspNetCore.Identity.Services.LocalizedIdentityErrorDescriber;
 
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
 {
     public static class DependencyInjection
     {
         public static void ConfigureDatabase<TIDbContext, TContext, TUser, TAccount, TSession>(
-            this IServiceCollection services,
-            InfrastructureOptions options)
+            this IInfrastructureServiceCollection infraCollection)
             where TIDbContext : class, IIdentityDbContext<TUser, TAccount, TSession>
             where TContext : IdentityDbContext<TUser, TAccount, TSession>, TIDbContext
             where TUser : ApplicationUser
             where TAccount : Account<TUser, TSession>
             where TSession : Session, new()
         {
-            services.AddDbContext<TContext>(
+            infraCollection.Services.AddDbContext<TContext>(
                 ops =>
                 {
                     ops.UseSqlServer(
-                        options.ConnectionString,
+                        infraCollection.Options.ConnectionString,
                         o => o.MigrationsAssembly(typeof(TContext).Assembly.FullName));
 
-                    if (options.IsDevelopment) ops.EnableSensitiveDataLogging();
+                    if (infraCollection.Options.IsDevelopment) ops.EnableSensitiveDataLogging();
                 });
 
-            services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession>, TContext>();
-            services.AddScoped<TIDbContext, TContext>();
+            infraCollection.Services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession>, TContext>();
+            infraCollection.Services.AddScoped<TIDbContext, TContext>();
 
-            services.AddHealthChecks()
+            infraCollection.Services.AddHealthChecks()
                 .AddDbContextCheck<TContext>();
 
-            services.ConfigureIdentity<TContext, TUser, TAccount, TSession>(options);
+            infraCollection.Services.ConfigureIdentity<TContext, TUser, TAccount, TSession>(infraCollection.Options);
         }
 
-        public static void ConfigureIdentity<TContext, TUser, TAccount, TSession>(
+        private static void ConfigureIdentity<TContext, TUser, TAccount, TSession>(
             this IServiceCollection services,
             InfrastructureOptions options)
             where TContext : IdentityDbContext<TUser, TAccount, TSession>

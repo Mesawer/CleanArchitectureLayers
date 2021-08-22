@@ -8,6 +8,7 @@ using Mesawer.DomainLayer.CustomIdentity.Entities;
 using Mesawer.DomainLayer.Entities;
 using Mesawer.InfrastructureLayer.CustomIdentity.Persistence;
 using Mesawer.InfrastructureLayer.CustomIdentity.Services;
+using Mesawer.InfrastructureLayer.Interfaces;
 using Mesawer.InfrastructureLayer.Models;
 using Mesawer.InfrastructureLayer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,8 +22,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity
     public static class DependencyInjection
     {
         public static void ConfigureDatabase<TIDbContext, TContext, TUser, TAccount, TSession, TRole>(
-            this IServiceCollection services,
-            InfrastructureOptions options)
+            this IInfrastructureServiceCollection infraCollection)
             where TIDbContext : class, IIdentityDbContext<TUser, TAccount, TSession, TRole>
             where TContext : ApplicationDbContext<TUser, TAccount, TSession, TRole>, TIDbContext
             where TUser : ApplicationUser
@@ -30,26 +30,26 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity
             where TSession : Session, new()
             where TRole : Enum
         {
-            services.AddDbContext<TContext>(
+            infraCollection.Services.AddDbContext<TContext>(
                 ops =>
                 {
                     ops.UseSqlServer(
-                        options.ConnectionString,
+                        infraCollection.Options.ConnectionString,
                         o => o.MigrationsAssembly(typeof(TContext).Assembly.FullName));
 
-                    if (options.IsDevelopment) ops.EnableSensitiveDataLogging();
+                    if (infraCollection.Options.IsDevelopment) ops.EnableSensitiveDataLogging();
                 });
 
-            services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession, TRole>, TContext>();
-            services.AddScoped<TIDbContext, TContext>();
+            infraCollection.Services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession, TRole>, TContext>();
+            infraCollection.Services.AddScoped<TIDbContext, TContext>();
 
-            services.AddHealthChecks()
+            infraCollection.Services.AddHealthChecks()
                 .AddDbContextCheck<TContext>();
 
-            services.ConfigureIdentity<TUser, TAccount, TSession, TRole>(options);
+            infraCollection.Services.ConfigureIdentity<TUser, TAccount, TSession, TRole>(infraCollection.Options);
         }
 
-        public static void ConfigureIdentity<TUser, TAccount, TSession, TRole>(
+        private static void ConfigureIdentity<TUser, TAccount, TSession, TRole>(
             this IServiceCollection services,
             InfrastructureOptions options)
             where TUser : ApplicationUser
