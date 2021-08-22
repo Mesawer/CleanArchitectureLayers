@@ -47,7 +47,9 @@ namespace Mesawer.PresentationLayer.Filters
         {
             var type = context.Exception.GetType();
 
-            if (_exceptionHandlers.ContainsKey(type))
+            var key = _exceptionHandlers.FirstOrDefault(e => e.Key.IsAssignableFrom(type)).Key;
+
+            if (key is not null)
             {
                 _exceptionHandlers[type].Invoke(context);
                 return;
