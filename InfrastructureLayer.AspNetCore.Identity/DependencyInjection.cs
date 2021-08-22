@@ -41,6 +41,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
                     if (infraCollection.Options.IsDevelopment) ops.EnableSensitiveDataLogging();
                 });
 
+            infraCollection.Services.AddScoped<IDbContext<TSession>, TContext>();
             infraCollection.Services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession>, TContext>();
             infraCollection.Services.AddScoped<TIDbContext, TContext>();
 
@@ -131,8 +132,8 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
 
             services.AddTransient<ITokenService<TUser>, TokenService<TUser, TAccount, TSession>>();
 
-            services.AddScoped<ITokenGeneratorService<TUser>, Services.TokenGeneratorService<TUser>>();
-            services.AddScoped<ITokenValidatorService, Services.TokenValidatorService>();
+            services.AddScoped<ITokenGeneratorService<TUser>, TokenGeneratorService<TUser>>();
+            services.AddScoped<ITokenValidatorService, TokenValidatorService>();
             services.AddScoped<IUserValidatorService, UserValidatorService<TSession>>();
             services
                 .AddScoped<IIdentityManager<TUser, TAccount, TSession>, IdentityManager<TUser, TAccount, TSession>>();

@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using ZymLabs.NSwag.FluentValidation;
 
 namespace Mesawer.PresentationLayer
 {
@@ -67,7 +66,7 @@ namespace Mesawer.PresentationLayer
             this IServiceCollection services,
             PresentationOptions options)
         {
-            services.AddSingleton<FluentValidationSchemaProcessor>();
+            //services.AddSingleton<FluentValidationSchemaProcessor>();
 
             if (!options.IsProduction)
                 services.AddOpenApiDocument((configure, serviceProvider) =>
@@ -92,8 +91,8 @@ namespace Mesawer.PresentationLayer
                     configure.GenerateEnumMappingDescription = true;
 
                     // Add the fluent validations schema processor
-                    var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();
-                    configure.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+                    //var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();
+                    //configure.SchemaProcessors.Add(fluentValidationSchemaProcessor);
                 });
         }
 

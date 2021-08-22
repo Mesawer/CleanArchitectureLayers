@@ -158,7 +158,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity.Services
 
             session = new TSession
             {
-                UserId     = userId,
+                Id         = Guid.NewGuid().ToString("N"),
                 MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
                 LastLogin  = _dateTime.Now
             };

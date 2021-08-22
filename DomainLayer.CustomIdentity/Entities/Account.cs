@@ -22,6 +22,7 @@ namespace Mesawer.DomainLayer.CustomIdentity.Entities
         public string UserId { get; set; }
         public TUser User { get; set; }
 
+        public string SessionId { get; set; }
         public TSession Session { get; set; }
     }
 }

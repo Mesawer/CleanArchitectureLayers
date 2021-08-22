@@ -10,9 +10,9 @@ namespace Mesawer.InfrastructureLayer.Persistence
     {
         public void Configure(EntityTypeBuilder<TSession> entity)
         {
-            entity.HasKey(s => s.UserId);
+            entity.HasKey(s => s.Id);
 
-            entity.Property(s => s.UserId).HasMaxLength(IdMaxLength);
+            entity.Property(s => s.Id).HasMaxLength(IdMaxLength);
             entity.Property(s => s.Token).HasMaxLength(UriMaxLength);
             entity.Property(s => s.MacAddress).HasMaxLength(MacMaxLength);
 

@@ -15,7 +15,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence
 
             entity.HasOne(a => a.Session)
                 .WithOne()
-                .HasForeignKey<TSession>(a => a.UserId)
+                .HasForeignKey<TAccount>(a => a.SessionId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -40,6 +40,7 @@ namespace Mesawer.InfrastructureLayer.CustomIdentity
                     if (infraCollection.Options.IsDevelopment) ops.EnableSensitiveDataLogging();
                 });
 
+            infraCollection.Services.AddScoped<IDbContext<TSession>, TContext>();
             infraCollection.Services.AddScoped<IIdentityDbContext<TUser, TAccount, TSession, TRole>, TContext>();
             infraCollection.Services.AddScoped<TIDbContext, TContext>();
 

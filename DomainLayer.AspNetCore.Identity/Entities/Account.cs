@@ -16,6 +16,8 @@ namespace Mesawer.DomainLayer.AspNetCore.Identity.Entities
         public Language Language { get; set; }
 
         public TUser User { get; set; }
+
+        public string SessionId { get; set; }
         public TSession Session { get; set; }
     }
 }
