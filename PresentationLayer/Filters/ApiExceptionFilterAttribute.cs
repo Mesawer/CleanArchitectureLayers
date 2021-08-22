@@ -51,7 +51,7 @@ namespace Mesawer.PresentationLayer.Filters
 
             if (key is not null)
             {
-                _exceptionHandlers[type].Invoke(context);
+                _exceptionHandlers[key].Invoke(context);
                 return;
             }
 
