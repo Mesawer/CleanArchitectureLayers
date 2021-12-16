@@ -17,6 +17,7 @@ using Mesawer.ApplicationLayer.Models;
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
 using Mesawer.DomainLayer.AspNetCore.Identity.Enums;
 using Mesawer.DomainLayer.Entities;
+using Mesawer.InfrastructureLayer.AspNetCore.Identity.Models;
 using Mesawer.InfrastructureLayer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
@@ -37,6 +38,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
         private const string GoogleLoginProvider   = "google";
         private const string FacebookLoginProvider = "facebook";
+        private const string AppleLoginProvider    = "apple";
 
         private readonly IIdentityManager<TUser> _identityManager;
         private readonly IHostEnvironment        _env;
@@ -91,6 +93,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             {
                 GoogleLoginProvider   => LoginProvider.Google,
                 FacebookLoginProvider => LoginProvider.Facebook,
+                AppleLoginProvider    => LoginProvider.Apple,
                 _                     => throw new BadRequestException(SharedRes.NotSupportedProvider)
             };
 
@@ -98,7 +101,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             {
                 LoginProvider.Facebook => await ValidateFacebookAccessToken(token),
                 LoginProvider.Google   => await ValidateGoogleIdToken(token),
-                LoginProvider.Apple    => throw new NotImplementedException(),
+                LoginProvider.Apple    => await ValidateAppleIdentityToken(token),
                 LoginProvider.Twitter  => throw new NotImplementedException(),
                 _                      => throw new ArgumentOutOfRangeException()
             };
@@ -137,6 +140,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             {
                 GoogleLoginProvider   => await ValidateGoogleIdToken(token),
                 FacebookLoginProvider => await ValidateFacebookAccessToken(token),
+                AppleLoginProvider    => await ValidateAppleIdentityToken(token),
                 _                     => throw new BadRequestException(SharedRes.NotSupportedProvider)
             };
 
@@ -184,6 +188,27 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
                     LastName  = response.LastName
                 },
                 Picture = response.Picture.Data.Url
+            };
+        }
+
+        // Validates Apple IdentityToken
+        // As in https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user
+        private async Task<SocialUser> ValidateAppleIdentityToken(string token)
+        {
+            var response = await AppleJwtVerifier.Verify(token);
+
+            if (response is null) throw new BadRequestException(SharedRes.InvalidLogin);
+
+            return new SocialUser
+            {
+                Provider = LoginProvider.Apple,
+                Id       = response.Id,
+                Email    = response.Email,
+                FullName = new FullNameDto
+                {
+                    FirstName = response.Name?.FirstName ?? "Apple",
+                    LastName  = response.Name?.LastName ?? "User"
+                }
             };
         }
 

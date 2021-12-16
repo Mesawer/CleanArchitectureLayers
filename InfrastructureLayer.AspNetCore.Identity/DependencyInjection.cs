@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using IdentityOptions = Mesawer.InfrastructureLayer.Models.IdentityOptions;
 using LocalizedIdentityErrorDescriber =
     Mesawer.InfrastructureLayer.AspNetCore.Identity.Services.LocalizedIdentityErrorDescriber;
 
@@ -140,7 +141,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
 
             services.AddSingleton<IApplicationUserService, ApplicationUserService>();
 
-            services.Configure<Models.IdentityOptions>(config =>
+            services.Configure<IdentityOptions>(config =>
             {
                 config.RestrictSingleLogin      = options.IdentityOptions.RestrictSingleLogin;
                 config.LogoutOnNewLogin         = options.IdentityOptions.LogoutOnNewLogin;
