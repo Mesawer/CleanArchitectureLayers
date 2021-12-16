@@ -41,17 +41,20 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         private const string AppleLoginProvider    = "apple";
 
         private readonly IIdentityManager<TUser> _identityManager;
+        private readonly AppleJwtVerifier        _appleJwtVerifier;
         private readonly IHostEnvironment        _env;
         private readonly JwtConfig               _jwtConfig;
 
         public TokenService(
             IIdentityManager<TUser> identityManager,
+            AppleJwtVerifier appleJwtVerifier,
             IOptionsMonitor<JwtConfig> config,
             IHostEnvironment env)
         {
-            _identityManager = identityManager;
-            _env             = env;
-            _jwtConfig       = config.CurrentValue;
+            _identityManager  = identityManager;
+            _appleJwtVerifier = appleJwtVerifier;
+            _env              = env;
+            _jwtConfig        = config.CurrentValue;
         }
 
         public async Task<AuthResponse> GenerateAuthJwtToken(TUser user)
@@ -195,7 +198,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         // As in https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user
         private async Task<SocialUser> ValidateAppleIdentityToken(string token)
         {
-            var response = await AppleJwtVerifier.Verify(token);
+            var response = await _appleJwtVerifier.Verify(token);
 
             if (response is null) throw new BadRequestException(SharedRes.InvalidLogin);
 

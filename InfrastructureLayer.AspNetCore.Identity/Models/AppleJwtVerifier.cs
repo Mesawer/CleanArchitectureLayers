@@ -7,16 +7,22 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Models
 {
-    public static class AppleJwtVerifier
+    public class AppleJwtVerifier
     {
-        public static async Task<AppleInfo> Verify(string token)
+        private readonly IConfiguration _configuration;
+
+        public AppleJwtVerifier(IConfiguration configuration) => _configuration = configuration;
+
+        public async Task<AppleInfo> Verify(string token)
         {
-            const string issuer   = "https://appleid.apple.com";
-            const string clientId = "com.QMESolutions.QME";
+            var clientId = _configuration["AppleClientId"];
+
+            const string issuer = "https://appleid.apple.com";
 
             var validSignature = await VerifySignature(token);
 

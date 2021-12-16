@@ -6,6 +6,7 @@ using Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
 using Mesawer.ApplicationLayer.Interfaces;
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
 using Mesawer.DomainLayer.Entities;
+using Mesawer.InfrastructureLayer.AspNetCore.Identity.Models;
 using Mesawer.InfrastructureLayer.AspNetCore.Identity.Persistence;
 using Mesawer.InfrastructureLayer.AspNetCore.Identity.Services;
 using Mesawer.InfrastructureLayer.Interfaces;
@@ -130,6 +131,8 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity
                     });
 
             services.AddAuthorization();
+
+            services.AddScoped<AppleJwtVerifier>();
 
             services.AddTransient<ITokenService<TUser>, TokenService<TUser, TAccount, TSession>>();
 
