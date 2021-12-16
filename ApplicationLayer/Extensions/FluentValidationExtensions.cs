@@ -171,6 +171,34 @@ namespace Mesawer.ApplicationLayer.Extensions
                         .MaximumLength(maxLength);
                 });
 
+        public static IRuleBuilder<T, LocalizedStringDto> WeakLocalizedString<T>(
+            this IRuleBuilder<T, LocalizedStringDto> builder,
+            int maxLength = NameMaxLength)
+            => builder
+                .NotNull()
+                .ChildRules(str =>
+                {
+                    str.RuleFor(s => s.Ar)
+                        .NotEmpty()
+                        .MaximumLength(maxLength);
+
+                    str.RuleFor(s => s.En)
+                        .NotEmpty()
+                        .MaximumLength(maxLength);
+                });
+
+        public static IRuleBuilder<T, LocalizedStringDto> NullableWeakLocalizedString<T>(
+            this IRuleBuilder<T, LocalizedStringDto> builder,
+            int maxLength = NameMaxLength)
+            => builder
+                .NotNull()
+                .ChildRules(str =>
+                {
+                    str.RuleFor(s => s.Ar).MaximumLength(maxLength);
+
+                    str.RuleFor(s => s.En).MaximumLength(maxLength);
+                });
+
         public static IRuleBuilder<T, LocalizedStringDto> UniqueLocalizedString<T, TEntity>(
             this IRuleBuilder<T, LocalizedStringDto> builder,
             IQueryable<TEntity> queryable,
