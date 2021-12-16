@@ -44,7 +44,7 @@ namespace Mesawer.ApplicationLayer
 
         public const string ZipCode = @"^[a-zA-Z0-9][a-zA-Z0-9\- ]{0,10}[a-zA-Z0-9]$";
 
-        public const string PhoneNumber = @"^(\+\d{1,3}) (\d{10})$";
+        public const string PhoneNumber = @"^\+?(\d{1,3}) (\d{10})$";
 
         public const string ArabicName =
             @"[\u0600-\u06ff]|[\u0750-\u077f]|[\ufb50-\ufbc1]|[\ufbd3-\ufd3f]|[\ufd50-\ufd8f]|[\ufd92-\ufdc7]|[\ufe70-\ufefc]|[\uFDF0-\uFDFD]";

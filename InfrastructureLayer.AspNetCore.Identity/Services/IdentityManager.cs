@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Mesawer.ApplicationLayer;
+using Mesawer.ApplicationLayer.AspNetCore.Identity.Exceptions;
 using Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -49,12 +50,14 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             var match = Regex.Match(phoneNumber, Regexes.PhoneNumber);
 
-            if (!match.Success) return null;
+            if (!match.Success) throw new BadRequestException("This country's phone numbers aren't supported");
 
             var code   = Convert.ToInt32(match.Groups[1].ToString());
             var number = match.Groups[2].ToString();
 
-            return codes.Any(c => c.Item1 == code && number.Length == c.Item2) ? phoneNumber : null;
+            return codes.Any(c => c.Item1 == code && number.Length == c.Item2)
+                ? phoneNumber
+                : throw new BadRequestException("This country's phone numbers aren't supported");
         }
     }
 }
