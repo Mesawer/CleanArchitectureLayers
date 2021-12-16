@@ -122,7 +122,7 @@
     <value>An external login is already associated with this account</value>
   </data>
   <data name="PasswordMismatch" xml:space="preserve">
-    <value>The provided password doesn't match your saved your saved password</value>
+    <value>The provided password doesn't match your saved password</value>
   </data>
   <data name="PasswordRequiresDigit" xml:space="preserve">
     <value>The password must contain digits (0-9)</value>
