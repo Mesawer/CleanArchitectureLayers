@@ -10,6 +10,8 @@ namespace Mesawer.ApplicationLayer.Models
 
         public LocalizedString ToLocalizedString() => (LocalizedString) (Ar, En);
 
+        public WeakLocalizedString ToWeakLocalizedString() => (WeakLocalizedString) (Ar, En);
+
         public static LocalizedStringDto Create(LocalizedString source)
             => new()
             {
