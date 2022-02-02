@@ -19,6 +19,13 @@ namespace Mesawer.ApplicationLayer.Models
                 En = source.En
             };
 
+        public static LocalizedStringDto Create(WeakLocalizedString source)
+            => new()
+            {
+                Ar = source.Ar,
+                En = source.En
+            };
+
         public static bool operator ==(LocalizedString str, LocalizedStringDto dto)
             => str?.Ar == dto?.Ar || str?.En == dto?.En;
 

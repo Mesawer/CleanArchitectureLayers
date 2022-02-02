@@ -108,16 +108,21 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Models
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .ToList();
 
+            var expiration     = FindClaim(nameof(AppleInfo.Expiration));
+            var emailVerified  = FindClaim(nameof(AppleInfo.EmailVerified));
+            var name           = FindClaim(nameof(AppleInfo.Name));
+            var nonceSupported = FindClaim(nameof(AppleInfo.NonceSupported));
+
             var info = new AppleInfo
             {
                 Id             = FindClaim(nameof(AppleInfo.Id)),
                 Issuer         = FindClaim(nameof(AppleInfo.Issuer)),
                 Audience       = FindClaim(nameof(AppleInfo.Audience)),
-                Expiration     = Convert.ToInt64(FindClaim(nameof(AppleInfo.Expiration))),
+                Expiration     = expiration is not null ? Convert.ToInt64(expiration) : default,
                 Email          = FindClaim(nameof(AppleInfo.Email)),
-                EmailVerified  = Convert.ToBoolean(FindClaim(nameof(AppleInfo.EmailVerified))),
-                Name           = JsonConvert.DeserializeObject<AppleInfo.FullName>(FindClaim(nameof(AppleInfo.Name))),
-                NonceSupported = Convert.ToBoolean(FindClaim(nameof(AppleInfo.NonceSupported))),
+                EmailVerified  = emailVerified is not null ? Convert.ToBoolean(emailVerified) : default,
+                Name           = name is not null ? JsonConvert.DeserializeObject<AppleInfo.FullName>(name) : null,
+                NonceSupported = nonceSupported is not null && Convert.ToBoolean(nonceSupported),
                 Data           = claims.ToDictionary(c => c.Type, c => c.Value)
             };
 
