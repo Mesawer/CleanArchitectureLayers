@@ -11,13 +11,30 @@ namespace Mesawer.ApplicationLayer.Extensions
         /// <summary>
         /// Creates a selector expression using a property name e.g. c => c.Property
         /// </summary>
-        public static Expression<Func<T, string>> CreateSelectorExpression<T>(this Type type, string propertyName)
+        /// <param name="type">Just a placeholder that means nothing</param>
+        /// <param name="propertyName">It's the navigation path (e.g. Value.Length) to produce c => c.Value.Length</param>
+        public static LambdaExpression CreateSelectorExpression<T>(this Type type, string propertyName)
         {
             var parameterExpression = Expression.Parameter(typeof(T));
 
-            return (Expression<Func<T, string>>) Expression.Lambda(
-                Expression.PropertyOrField(parameterExpression, propertyName),
-                parameterExpression);
+            var members = propertyName.Split('-').ToList();
+
+            if (!members.Any()) return null;
+
+            try
+            {
+                var memberExpression = Expression.PropertyOrField(parameterExpression, members[0]);
+
+                memberExpression = members.Skip(1)
+                    .ToList()
+                    .Aggregate(memberExpression, Expression.PropertyOrField);
+
+                return Expression.Lambda(memberExpression, parameterExpression);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -59,6 +76,35 @@ namespace Mesawer.ApplicationLayer.Extensions
 
             return method;
         }
+
+        /// <summary>
+        /// Checks if the <paramref name="testType"/> is the same/instance type of <paramref name="sourceType"/> even if it's nullable type
+        /// </summary>
+        public static bool IsOfType(this Type sourceType, Type testType)
+        {
+            if (!sourceType.IsGenericType) return sourceType == testType || sourceType.IsSubclassOf(testType);
+
+            if (sourceType.GetGenericTypeDefinition() != typeof(Nullable<>)) return false;
+
+            var innerType = sourceType.GetInnerTypes()[0];
+
+            return testType == innerType || innerType.IsSubclassOf(sourceType);
+        }
+
+        /// <summary>
+        /// Gets the generic arguments of a generic type
+        /// </summary>
+        /// <returns>A list of the generic arguments or null if the <paramref name="type"/> isn't generic</returns>
+        public static Type[] GetInnerTypes(this Type type)
+        {
+            if (type is null) return null;
+
+            if (!type.IsGenericType || type.GetGenericArguments().Length > 1) return null;
+
+            return type.GetGenericArguments();
+        }
+
+        public static object GetDefault(this Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
 
         /// <summary>
         /// Aggregates the passed in array of expressions using the Or expression

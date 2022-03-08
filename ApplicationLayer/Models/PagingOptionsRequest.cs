@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation;
 using Mesawer.ApplicationLayer.Extensions;
+using Mesawer.DomainLayer.ValueObjects;
 
 namespace Mesawer.ApplicationLayer.Models
 {
@@ -46,9 +47,13 @@ namespace Mesawer.ApplicationLayer.Models
 
             if (sortProperty is null) return query;
 
-            var keySelector = typeof(T).CreateSelectorExpression<T>(sortProperty.Name);
+            var keySelector  = typeof(T).CreateSelectorExpression<T>(sortProperty.Name)?.Body.ToString();
 
-            return Ascending ? query.OrderBy(keySelector) : query.OrderByDescending(keySelector);
+            if (keySelector is null) return query;
+
+            var propertyName = keySelector[(keySelector.IndexOf('.') + 1)..];
+
+            return Ascending ? query.OrderBy(propertyName) : query.OrderByDescending(propertyName);
         }
 
         public IQueryable<T> ApplyQuery<T>(
@@ -61,24 +66,43 @@ namespace Mesawer.ApplicationLayer.Models
 
             var search = Search.Trim().ToLower();
 
-            var containsMethod = typeof(string).GetMethods().First(m
-                => m.Name == nameof(string.Contains) &&
-                   m.GetParameters().Length == 1 &&
-                   m.GetParameters().First().ParameterType == typeof(string));
+            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), 1, new[] { typeof(string) })!;
 
-            var toLowerMethod = typeof(string).GetMethods()
-                .First(m => m.Name == nameof(string.ToLower) && !m.GetParameters().Any());
+            var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), 0, Array.Empty<Type>())!;
+
+            var toStringMethod = typeof(object).GetMethod(nameof(ToString))!;
 
             var obj = Expression.Parameter(typeof(T), list.First().Parameters.First().Name);
 
             var comparisonExpressions = list
-                .Select(expression =>
+                .SelectMany(expression =>
                 {
                     var copiedExpression = ExpressionConverter<T>.Convert(expression, obj);
 
-                    return (Expression) Expression.Call(Expression.Call(copiedExpression.Body, toLowerMethod),
-                        containsMethod,
-                        Expression.Constant(search));
+                    var bodyType = copiedExpression.Body.Type;
+
+                    if (bodyType == typeof(LocalizedString))
+                    {
+                        var localExpressions = copiedExpression.BuildExpressions<T, LocalizedString>();
+
+                        return localExpressions.Select(AppendMethods).ToList();
+                    }
+
+                    if (bodyType == typeof(FullName))
+                    {
+                        var localExpressions = copiedExpression.BuildExpressions<T, LocalizedString>();
+
+                        return localExpressions.Select(AppendMethods).ToList();
+                    }
+
+                    Expression AppendMethods(Expression ex)
+                    {
+                        var afterToString = Expression.Call(ex, toStringMethod); // for safety
+                        var afterToLower  = Expression.Call(afterToString, toLowerMethod);
+                        return Expression.Call(afterToLower, containsMethod, Expression.Constant(search));
+                    }
+
+                    return new List<Expression> { AppendMethods(expression.Body) };
                 })
                 .ToArray();
 
