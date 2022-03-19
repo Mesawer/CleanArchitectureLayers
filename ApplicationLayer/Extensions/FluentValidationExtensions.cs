@@ -102,8 +102,8 @@ namespace Mesawer.ApplicationLayer.Extensions
             var contentTypes = fileType switch
             {
                 FileType.Picture   => new[] { "jpg", "jpeg", "png" },
-                FileType.Audio     => new[] { "mp3" },
-                FileType.Video     => new[] { "mp4" },
+                FileType.Audio     => new[] { "mp3", "wav", "ase", "webm" },
+                FileType.Video     => new[] { "mp4", "webm" },
                 FileType.Pdf       => new[] { "pdf" },
                 FileType.Document  => new[] { "pdf" },
                 FileType.Text      => new[] { "txt" },

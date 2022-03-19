@@ -17,7 +17,7 @@ namespace Mesawer.ApplicationLayer.Extensions
         {
             var parameterExpression = Expression.Parameter(typeof(T));
 
-            var members = propertyName.Split('-').ToList();
+            var members = propertyName?.Split('-').ToList() ?? new List<string>();
 
             if (!members.Any()) return null;
 
@@ -25,9 +25,12 @@ namespace Mesawer.ApplicationLayer.Extensions
             {
                 var memberExpression = Expression.PropertyOrField(parameterExpression, members[0]);
 
-                memberExpression = members.Skip(1)
-                    .ToList()
-                    .Aggregate(memberExpression, Expression.PropertyOrField);
+                if (members.Count > 1)
+                {
+                    memberExpression = members.Skip(1)
+                        .ToList()
+                        .Aggregate(memberExpression, Expression.PropertyOrField);
+                }
 
                 return Expression.Lambda(memberExpression, parameterExpression);
             }

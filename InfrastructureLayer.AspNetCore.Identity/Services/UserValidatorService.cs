@@ -37,6 +37,14 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             _identityOptions = userIdentityOptions.Value;
         }
 
+        /// <summary>
+        /// Validates user identity using a certain session <paramref name="token"/>
+        /// </summary>
+        /// <param name="userId">User's Id</param>
+        /// <param name="token">Session token, or null to reset session</param>
+        /// <param name="ct">Cancellation Token</param>
+        /// <returns>A boolean indicating whether valid or not</returns>
+        /// <remarks>Thread Safe</remarks>
         public async Task<bool> VerifyUserIdentityAsync(string userId, string token, CancellationToken ct)
         {
             var session = await GetOrCreateSession(userId, ct);
@@ -53,6 +61,14 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             return true;
         }
 
+        /// <summary>
+        /// Validates user identity using a certain session <paramref name="token"/>
+        /// </summary>
+        /// <param name="userId">User's Id</param>
+        /// <param name="token">Session token, or null to reset session</param>
+        /// <param name="ct">Cancellation Token</param>
+        /// <exception cref="UnauthorizedException"></exception>
+        /// <exception cref="BadRequestException"></exception>
         public async Task ValidateUserIdentityAsync(string userId, string token, CancellationToken ct)
         {
             var session = await GetOrCreateSession(userId, ct);
@@ -69,7 +85,18 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             var token        = Guid.NewGuid().ToString("N");
             var refreshToken = GenerateRefreshToken();
 
-            if (session is null) return (token, refreshToken);
+            if (session is null)
+            {
+                var mac = GetUserMacAddress();
+
+                session = new TSession
+                {
+                    UserId     = userId,
+                    MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
+                };
+
+                await _context.Sessions.AddAsync(session, ct);
+            }
 
             session.Token        = token;
             session.RefreshToken = refreshToken;
@@ -80,6 +107,12 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             return (token, refreshToken);
         }
 
+        /// <summary>
+        /// Resets User Session if exists
+        /// </summary>
+        /// <param name="userId">User's Id</param>
+        /// <param name="forced">true to reset the MacAddress</param>
+        /// <param name="ct">Cancellation Token</param>
         public async Task ResetUserSessionAsync(string userId, bool forced, CancellationToken ct)
         {
             var session = await _context.Sessions.FindByKeyAsync(userId, ct);

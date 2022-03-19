@@ -34,26 +34,25 @@ namespace Mesawer.ApplicationLayer.Models
 
         public IQueryable<T> Handle<T>(IQueryable<T> query, bool all)
         {
+            var keySelector = typeof(T).CreateSelectorExpression<T>(SortBy)?.Body.ToString();
+
+            if (keySelector is not null)
+            {
+                var propertyName = keySelector[(keySelector.IndexOf('.') + 1)..];
+
+                query = Ascending
+                    ? query.OrderBy(propertyName).AsQueryable()
+                    : query.OrderByDescending(propertyName).AsQueryable();
+            }
+
             var (asc, page) = GetPageIndex();
             var offset = GetOffset();
 
-            if (!all)
-                query = asc
-                    ? query.Skip(page * offset).Take(offset)
-                    : query.SkipLast(Math.Abs(page) * offset).TakeLast(offset);
+            if (all) return query;
 
-            var sortProperty = typeof(T).GetProperties(BindingFlags.Public)
-                .FirstOrDefault(p => p.CanRead && p.Name.ToLower() == SortBy);
-
-            if (sortProperty is null) return query;
-
-            var keySelector  = typeof(T).CreateSelectorExpression<T>(sortProperty.Name)?.Body.ToString();
-
-            if (keySelector is null) return query;
-
-            var propertyName = keySelector[(keySelector.IndexOf('.') + 1)..];
-
-            return Ascending ? query.OrderBy(propertyName) : query.OrderByDescending(propertyName);
+            return asc
+                ? query.Skip(page * offset).Take(offset)
+                : query.SkipLast(Math.Abs(page) * offset).TakeLast(offset);
         }
 
         public IQueryable<T> ApplyQuery<T>(
@@ -66,11 +65,9 @@ namespace Mesawer.ApplicationLayer.Models
 
             var search = Search.Trim().ToLower();
 
-            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), 1, new[] { typeof(string) })!;
+            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), 0, new[] { typeof(string) })!;
 
             var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), 0, Array.Empty<Type>())!;
-
-            var toStringMethod = typeof(object).GetMethod(nameof(ToString))!;
 
             var obj = Expression.Parameter(typeof(T), list.First().Parameters.First().Name);
 
@@ -97,8 +94,8 @@ namespace Mesawer.ApplicationLayer.Models
 
                     Expression AppendMethods(Expression ex)
                     {
-                        var afterToString = Expression.Call(ex, toStringMethod); // for safety
-                        var afterToLower  = Expression.Call(afterToString, toLowerMethod);
+                        var afterToLower = Expression.Call(ex, toLowerMethod);
+
                         return Expression.Call(afterToLower, containsMethod, Expression.Constant(search));
                     }
 
