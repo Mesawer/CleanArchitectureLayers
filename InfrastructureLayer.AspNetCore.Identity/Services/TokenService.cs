@@ -154,18 +154,16 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             var response = JsonConvert.DeserializeObject<GoogleResponse>(result);
 
-            if (response is null) throw new BadRequestException(SharedRes.InvalidLogin);
+            if (response?.Id is null || response.Email is null) throw new BadRequestException(SharedRes.InvalidLogin);
 
             return new SocialUser
             {
                 Provider = LoginProvider.Google,
                 Id       = response.Id,
                 Email    = response.Email,
-                FullName = new FullNameDto
-                {
-                    FirstName = response.FirstName,
-                    LastName  = response.LastName
-                },
+                FullName = response.FirstName is not null || response.LastName is not null
+                    ? FullNameDto.Create(response.FirstName, response.LastName)
+                    : FullNameDto.Create("Google", "User"),
                 Picture = response.Picture
             };
         }
@@ -178,18 +176,16 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             var response = JsonConvert.DeserializeObject<FacebookResponse>(result);
 
-            if (response is null) throw new BadRequestException(SharedRes.InvalidLogin);
+            if (response?.Id is null || response.Email is null) throw new BadRequestException(SharedRes.InvalidLogin);
 
             return new SocialUser
             {
                 Provider = LoginProvider.Facebook,
                 Id       = response.Id,
                 Email    = response.Email,
-                FullName = new FullNameDto
-                {
-                    FirstName = response.FirstName,
-                    LastName  = response.LastName
-                },
+                FullName = response.FirstName is not null || response.LastName is not null
+                    ? FullNameDto.Create(response.FirstName, response.LastName)
+                    : FullNameDto.Create("Facebook", "User"),
                 Picture = response.Picture.Data.Url
             };
         }
@@ -200,18 +196,16 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         {
             var response = await _appleJwtVerifier.Verify(token);
 
-            if (response is null) throw new BadRequestException(SharedRes.InvalidLogin);
+            if (response?.Id is null || response.Email is null) throw new BadRequestException(SharedRes.InvalidLogin);
 
             return new SocialUser
             {
                 Provider = LoginProvider.Apple,
                 Id       = response.Id,
                 Email    = response.Email,
-                FullName = new FullNameDto
-                {
-                    FirstName = response.Name?.FirstName ?? "Apple",
-                    LastName  = response.Name?.LastName ?? "User"
-                }
+                FullName = response.Name is not null
+                    ? FullNameDto.Create(response.Name.FirstName, response.Name.LastName)
+                    : FullNameDto.Create("Apple", "User")
             };
         }
 

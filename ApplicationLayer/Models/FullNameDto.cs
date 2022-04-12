@@ -21,6 +21,13 @@ namespace Mesawer.ApplicationLayer.Models
             return (FullName) (firstName, lastName);
         }
 
+        public static FullNameDto Create(string firstName, string lastName)
+            => new()
+            {
+                FirstName = firstName,
+                LastName  = lastName
+            };
+
         public static FullNameDto Create(FullName source)
             => new()
             {
