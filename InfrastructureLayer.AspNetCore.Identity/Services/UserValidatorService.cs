@@ -41,7 +41,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         /// Validates user identity using a certain session <paramref name="token"/>
         /// </summary>
         /// <param name="userId">User's Id</param>
-        /// <param name="token">Session token, or null to reset session</param>
+        /// <param name="token">Session token, or null to create/reset session</param>
         /// <param name="ct">Cancellation Token</param>
         /// <returns>A boolean indicating whether valid or not</returns>
         /// <remarks>Thread Safe</remarks>
@@ -65,7 +65,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         /// Validates user identity using a certain session <paramref name="token"/>
         /// </summary>
         /// <param name="userId">User's Id</param>
-        /// <param name="token">Session token, or null to reset session</param>
+        /// <param name="token">Session token, or null to create/reset session</param>
         /// <param name="ct">Cancellation Token</param>
         /// <exception cref="UnauthorizedException"></exception>
         /// <exception cref="BadRequestException"></exception>
@@ -92,7 +92,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
                 session = new TSession
                 {
                     UserId     = userId,
-                    MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
+                    MacAddress = mac is not null && Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
                 };
 
                 await _context.Sessions.AddAsync(session, ct);
@@ -163,7 +163,8 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             var mac = GetUserMacAddress();
 
-            if (!Regex.IsMatch(mac, Regexes.Mac)) throw new BadRequestException(SharedRes.UnauthorizedDevice);
+            if (mac is null || !Regex.IsMatch(mac, Regexes.Mac))
+                throw new BadRequestException(SharedRes.UnauthorizedDevice);
 
             if (loggedIn)
             {
@@ -188,7 +189,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             session = new TSession
             {
                 UserId     = userId,
-                MacAddress = Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
+                MacAddress = mac is not null && Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
                 LastLogin  = _dateTime.Now
             };
 
