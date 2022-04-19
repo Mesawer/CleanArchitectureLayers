@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using FluentValidation;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.DomainLayer.ValueObjects;
@@ -87,7 +86,7 @@ namespace Mesawer.ApplicationLayer.Models
 
                     if (bodyType == typeof(FullName))
                     {
-                        var localExpressions = copiedExpression.BuildExpressions<T, LocalizedString>();
+                        var localExpressions = copiedExpression.BuildExpressions<T, FullName>();
 
                         return localExpressions.Select(AppendMethods).ToList();
                     }
@@ -99,7 +98,7 @@ namespace Mesawer.ApplicationLayer.Models
                         return Expression.Call(afterToLower, containsMethod, Expression.Constant(search));
                     }
 
-                    return new List<Expression> { AppendMethods(expression.Body) };
+                    return new List<Expression> { AppendMethods(copiedExpression.Body) };
                 })
                 .ToArray();
 
