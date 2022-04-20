@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -6,13 +7,13 @@ using System.Threading.Tasks;
 using Mesawer.InfrastructureLayer.Resources;
 using Mesawer.ApplicationLayer;
 using Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
+using Mesawer.ApplicationLayer.Exceptions;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.ApplicationLayer.Interfaces;
 using Mesawer.DomainLayer.Entities;
 using Mesawer.InfrastructureLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using SendGrid.Helpers.Errors.Model;
 using BadRequestException = Mesawer.ApplicationLayer.Exceptions.BadRequestException;
 
 namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
@@ -37,15 +38,10 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             _identityOptions = userIdentityOptions.Value;
         }
 
-        /// <summary>
-        /// Validates user identity using a certain session <paramref name="token"/>
-        /// </summary>
-        /// <param name="userId">User's Id</param>
-        /// <param name="token">Session token, or null to create/reset session</param>
-        /// <param name="ct">Cancellation Token</param>
-        /// <returns>A boolean indicating whether valid or not</returns>
-        /// <remarks>Thread Safe</remarks>
-        public async Task<bool> VerifyUserIdentityAsync(string userId, string token, CancellationToken ct)
+        public async Task<bool> VerifyUserIdentityAsync(
+            [NotNull] string userId,
+            [NotNull] string token,
+            CancellationToken ct)
         {
             var session = await GetOrCreateSession(userId, ct);
 
@@ -61,15 +57,10 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             return true;
         }
 
-        /// <summary>
-        /// Validates user identity using a certain session <paramref name="token"/>
-        /// </summary>
-        /// <param name="userId">User's Id</param>
-        /// <param name="token">Session token, or null to create/reset session</param>
-        /// <param name="ct">Cancellation Token</param>
-        /// <exception cref="UnauthorizedException"></exception>
-        /// <exception cref="BadRequestException"></exception>
-        public async Task ValidateUserIdentityAsync(string userId, string token, CancellationToken ct)
+        public async Task ValidateUserIdentityAsync(
+            [NotNull] string userId,
+            [NotNull] string token,
+            CancellationToken ct)
         {
             var session = await GetOrCreateSession(userId, ct);
 
@@ -77,22 +68,20 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         }
 
         public async Task<(string token, string refreshToken)> UpdateUserSessionAsync(
-            string userId,
+            [NotNull] string userId,
             CancellationToken ct)
         {
             var session = await _context.Sessions.FindByKeyAsync(userId, ct);
 
             var token        = Guid.NewGuid().ToString("N");
             var refreshToken = GenerateRefreshToken();
+            var mac          = GetUserMacAddress();
 
             if (session is null)
             {
-                var mac = GetUserMacAddress();
-
                 session = new TSession
                 {
-                    UserId     = userId,
-                    MacAddress = mac is not null && Regex.IsMatch(mac, Regexes.Mac) ? mac : null,
+                    UserId = userId
                 };
 
                 await _context.Sessions.AddAsync(session, ct);
@@ -100,6 +89,7 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
 
             session.Token        = token;
             session.RefreshToken = refreshToken;
+            session.MacAddress   = mac is not null && Regex.IsMatch(mac, Regexes.Mac) ? mac : null;
             session.LastLogin    = _dateTime.Now;
 
             await _context.SaveChangesAsync(ct);
@@ -107,15 +97,9 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
             return (token, refreshToken);
         }
 
-        /// <summary>
-        /// Resets User Session if exists
-        /// </summary>
-        /// <param name="userId">User's Id</param>
-        /// <param name="forced">true to reset the MacAddress</param>
-        /// <param name="ct">Cancellation Token</param>
-        public async Task ResetUserSessionAsync(string userId, bool forced, CancellationToken ct)
+        public async Task ResetUserSessionAsync([NotNull] string userId, bool forced, CancellationToken ct)
         {
-            var session = await _context.Sessions.FindByKeyAsync(userId, ct);
+            var session = await GetOrCreateSession(userId, ct);
 
             if (session is null) return;
 
@@ -130,52 +114,34 @@ namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Services
         private async Task Validate(TSession session, string token, CancellationToken ct)
         {
             await ValidateSingleLogin(session, token, ct);
-            await ValidateSingleDevice(session, token is not null, ct);
+            await ValidateSingleDevice(session, ct);
         }
 
-        private async Task ValidateSingleLogin(TSession session, string token, CancellationToken ct)
+        private Task ValidateSingleLogin(TSession session, string token, CancellationToken ct)
         {
-            if (!_identityOptions.RestrictSingleLogin) return;
+            if (!_identityOptions.RestrictSingleLogin) return Task.CompletedTask;
 
-            // Checks if the user eligible for new token (login again)
-            if (token is null)
-            {
-                var expirationDate = session.LastLogin.AddHours(_identityOptions.SessionExpirationPeriod);
-
-                // Checks if there's no token in place, or if it's expired
-                if (session.Token is null || expirationDate.IsOlderThan(_dateTime.Now)) return;
-
-                if (!_identityOptions.LogoutOnNewLogin) throw new BadRequestException(SharedRes.AlreadyLoggedIn);
-
-                session.Token        = null;
-                session.RefreshToken = null;
-
-                await _context.SaveChangesAsync(ct);
-            }
+            if (token is null && !_identityOptions.LogoutOnNewLogin)
+                throw new BadRequestException(SharedRes.AlreadyLoggedIn);
 
             // Checks if valid user
-            if (session.Token != token) throw new UnauthorizedException();
+            if (session.Token != token) throw new ForbiddenAccessException();
+
+            return Task.CompletedTask;
         }
 
-        private async Task ValidateSingleDevice(TSession session, bool loggedIn, CancellationToken ct)
+        private Task ValidateSingleDevice(TSession session, CancellationToken ct)
         {
-            if (!_identityOptions.RestrictSingleDevice) return;
+            if (!_identityOptions.RestrictSingleDevice) return Task.CompletedTask;
 
             var mac = GetUserMacAddress();
 
             if (mac is null || !Regex.IsMatch(mac, Regexes.Mac))
                 throw new BadRequestException(SharedRes.UnauthorizedDevice);
 
-            if (loggedIn)
-            {
-                if (session.MacAddress != mac) throw new BadRequestException(SharedRes.UnauthorizedDevice);
-            }
-            else
-            {
-                session.MacAddress = mac;
+            if (session.MacAddress != mac) throw new BadRequestException(SharedRes.UnauthorizedDevice);
 
-                await _context.SaveChangesAsync(ct);
-            }
+            return Task.CompletedTask;
         }
 
         private async Task<TSession> GetOrCreateSession(string userId, CancellationToken ct)
