@@ -61,7 +61,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to There is already data found similiar to this one.
         /// </summary>
         public static string DataAlreadyExists {
             get {
@@ -70,7 +70,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Can&apos;t modify this entity because of its dependant data.
         /// </summary>
         public static string DependantData {
             get {
@@ -79,7 +79,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Invalid Data.
         /// </summary>
         public static string DomainExceptionMessage {
             get {
@@ -88,7 +88,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to This field.
         /// </summary>
         public static string Entity {
             get {
@@ -97,7 +97,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Requested data is not found.
         /// </summary>
         public static string EntityNotFound {
             get {
@@ -106,7 +106,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Invalid Arabic Value.
         /// </summary>
         public static string InvalidAr {
             get {
@@ -115,7 +115,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Invalid English Value.
         /// </summary>
         public static string InvalidEn {
             get {
@@ -124,7 +124,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Invalid Input.
         /// </summary>
         public static string InvalidInput {
             get {
@@ -133,7 +133,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to This name already exists.
         /// </summary>
         public static string NameAlreadyExists {
             get {
@@ -142,7 +142,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to This feature is currently under construction, sorry for the inconvenience!.
         /// </summary>
         public static string NotImplemented {
             get {
@@ -151,7 +151,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to File type is not allowed. allowed types is {ContentTypes}..
         /// </summary>
         public static string NotSupportedType {
             get {
@@ -160,7 +160,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Out of scope.
         /// </summary>
         public static string OutOfScope {
             get {
@@ -169,7 +169,7 @@ namespace Mesawer.ApplicationLayer.Resources.Common {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to One or more validation failures have occurred.
         /// </summary>
         public static string ValidationError {
             get {

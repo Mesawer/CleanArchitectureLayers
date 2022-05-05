@@ -61,7 +61,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to There&apos;s already a logged in session running.
         /// </summary>
         public static string AlreadyLoggedIn {
             get {
@@ -70,7 +70,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Failed to connect to the external provider.
         /// </summary>
         public static string FailedToConnect {
             get {
@@ -79,7 +79,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Invalid Login Attempt.
         /// </summary>
         public static string InvalidLogin {
             get {
@@ -88,7 +88,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Not Supported Provider.
         /// </summary>
         public static string NotSupportedProvider {
             get {
@@ -97,7 +97,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to It&apos;s too soon to request another token.
         /// </summary>
         public static string TooSoonForNewToken {
             get {
@@ -106,7 +106,7 @@ namespace Mesawer.InfrastructureLayer.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to This device isn&apos;t registered to this user.
         /// </summary>
         public static string UnauthorizedDevice {
             get {

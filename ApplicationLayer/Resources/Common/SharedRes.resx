@@ -118,42 +118,42 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DataAlreadyExists" xml:space="preserve">
-    <value />
+    <value>There is already data found similiar to this one</value>
   </data>
   <data name="DependantData" xml:space="preserve">
-    <value />
+    <value>Can't modify this entity because of its dependant data</value>
   </data>
   <data name="DomainExceptionMessage" xml:space="preserve">
-    <value />
+    <value>Invalid Data</value>
   </data>
   <data name="Entity" xml:space="preserve">
-    <value />
+    <value>This field</value>
   </data>
   <data name="EntityNotFound" xml:space="preserve">
-    <value />
+    <value>Requested data is not found</value>
   </data>
   <data name="InvalidAr" xml:space="preserve">
-    <value />
+    <value>Invalid Arabic Value</value>
   </data>
   <data name="InvalidEn" xml:space="preserve">
-    <value />
+    <value>Invalid English Value</value>
   </data>
   <data name="InvalidInput" xml:space="preserve">
-    <value />
+    <value>Invalid Input</value>
   </data>
   <data name="NameAlreadyExists" xml:space="preserve">
-    <value />
+    <value>This name already exists</value>
   </data>
   <data name="NotImplemented" xml:space="preserve">
-    <value />
+    <value>This feature is currently under construction, sorry for the inconvenience!</value>
   </data>
   <data name="NotSupportedType" xml:space="preserve">
-    <value />
+    <value>File type is not allowed. allowed types is {ContentTypes}.</value>
   </data>
   <data name="OutOfScope" xml:space="preserve">
-    <value />
+    <value>Out of scope</value>
   </data>
   <data name="ValidationError" xml:space="preserve">
-    <value />
+    <value>One or more validation failures have occurred</value>
   </data>
 </root>
