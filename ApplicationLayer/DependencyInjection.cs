@@ -5,29 +5,28 @@ using MediatR.Pipeline;
 using Mesawer.ApplicationLayer.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mesawer.ApplicationLayer
+namespace Mesawer.ApplicationLayer;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection ConfigureApplicationLayer(
+        this IServiceCollection services,
+        Assembly validationsExecutingAssembly,
+        Assembly mediatRExecutingAssembly)
     {
-        public static IServiceCollection ConfigureApplicationLayer(
-            this IServiceCollection services,
-            Assembly validationsExecutingAssembly,
-            Assembly mediatRExecutingAssembly)
-        {
-            services.AddValidatorsFromAssembly(validationsExecutingAssembly);
-            services.ConfigureMediatR(mediatRExecutingAssembly);
+        services.AddValidatorsFromAssembly(validationsExecutingAssembly);
+        services.ConfigureMediatR(mediatRExecutingAssembly);
 
-            return services;
-        }
+        return services;
+    }
 
-        private static void ConfigureMediatR(this IServiceCollection services, Assembly mediatRExecutingAssembly)
-        {
-            services.AddMediatR(mediatRExecutingAssembly);
+    private static void ConfigureMediatR(this IServiceCollection services, Assembly mediatRExecutingAssembly)
+    {
+        services.AddMediatR(mediatRExecutingAssembly);
 
-            services.AddTransient(typeof(IRequestPostProcessor<,>), typeof(LoggingBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
-        }
+        services.AddTransient(typeof(IRequestPostProcessor<,>), typeof(LoggingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
     }
 }

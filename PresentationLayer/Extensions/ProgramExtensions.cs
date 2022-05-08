@@ -13,70 +13,69 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
 
-namespace Mesawer.PresentationLayer.Extensions
+namespace Mesawer.PresentationLayer.Extensions;
+
+public static class ProgramExtensions
 {
-    public static class ProgramExtensions
+    public static IHostBuilder ConfigureLogging(this IHostBuilder hostBuilder)
     {
-        public static IHostBuilder ConfigureLogging(this IHostBuilder hostBuilder)
+        var env = Environment.GetEnvironmentVariable(Constants.EnvironmentVariableName) ?? "Production";
+
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", false, true)
+            .AddJsonFile($"appsettings.{env}.json", true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.WithProperty("Version", config["Version"])
+            .Enrich.WithExceptionDetails()
+            .ReadFrom.Configuration(config)
+            .CreateLogger();
+
+        Log.Information("::: Logging Started :::");
+
+        return hostBuilder.UseSerilog();
+    }
+
+    public static async Task<IHost> MigrateDatabase<TProgram, TContext>(
+        this IHost host,
+        Func<IServiceProvider, Task> seedFunc)
+        where TContext : DbContext
+    {
+        using var scope    = host.Services.CreateScope();
+        var       services = scope.ServiceProvider;
+
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<TProgram>>();
+
+        try
         {
-            var env = Environment.GetEnvironmentVariable(Constants.EnvironmentVariableName) ?? "Production";
+            var context = services.GetRequiredService<TContext>();
 
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.{env}.json", true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.WithProperty("Version", config["Version"])
-                .Enrich.WithExceptionDetails()
-                .ReadFrom.Configuration(config)
-                .CreateLogger();
-
-            Log.Information("::: Logging Started :::");
-
-            return hostBuilder.UseSerilog();
-        }
-
-        public static async Task<IHost> MigrateDatabase<TProgram, TContext>(
-            this IHost host,
-            Func<IServiceProvider, Task> seedFunc)
-            where TContext : DbContext
-        {
-            using var scope    = host.Services.CreateScope();
-            var       services = scope.ServiceProvider;
-
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<TProgram>>();
-
-            try
+            if (context.Database.IsSqlServer())
             {
-                var context = services.GetRequiredService<TContext>();
+                logger.LogInformation("-- Migrating Sql Server Database --");
 
-                if (context.Database.IsSqlServer())
-                {
-                    logger.LogInformation("-- Migrating Sql Server Database --");
-
-                    await context.Database.MigrateAsync();
-                }
-
-                await seedFunc(services);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-
-                throw;
+                await context.Database.MigrateAsync();
             }
 
-            return host;
+            await seedFunc(services);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+
+            throw;
         }
 
-        public static async Task RunAsync(this Task<IHost> hostTask)
-        {
-            var host = await hostTask;
-            await host.RunAsync();
-            Log.CloseAndFlush();
-        }
+        return host;
+    }
+
+    public static async Task RunAsync(this Task<IHost> hostTask)
+    {
+        var host = await hostTask;
+        await host.RunAsync();
+        Log.CloseAndFlush();
     }
 }

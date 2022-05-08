@@ -1,9 +1,9 @@
-namespace Mesawer.PresentationLayer
+namespace Mesawer.PresentationLayer;
+
+public static class ApiDocs
 {
-    public static class ApiDocs
-    {
-        public const string Description =
-            @"
+    public const string Description =
+        @"
 ==> Headers
 - ** Version ** -
     - The Version request HTTP header uses to determine the client's (Web App | Mobile App) version, so, that our APIs
@@ -90,5 +90,4 @@ API errors responses is based on [RFC7807](https://tools.ietf.org/html/rfc7807).
     - Our use: The server does not support, or refuses to support, the client version that was used in the request header.
     - [rfc2068#section-10.5.6](https://tools.ietf.org/html/rfc2068#section-10.5.6)
 ";
-    }
 }

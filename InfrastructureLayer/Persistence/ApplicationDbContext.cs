@@ -10,150 +10,149 @@ using Mesawer.DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Mesawer.InfrastructureLayer.Persistence
+namespace Mesawer.InfrastructureLayer.Persistence;
+
+public class ApplicationDbContext<TSession> : DbContext, IDbContext<TSession> where TSession : Session
 {
-    public class ApplicationDbContext<TSession> : DbContext, IDbContext<TSession> where TSession : Session
+    private readonly IApplicationUserService _currentUserService;
+    private readonly IDateTime               _dateTime;
+    private readonly IDomainEventService     _domainEventService;
+    private readonly IBackgroundJobService   _backgroundJob;
+    private          IDbContextTransaction   _currentTransaction;
+
+    public ApplicationDbContext(
+        DbContextOptions options,
+        IApplicationUserService currentUserService,
+        IDomainEventService domainEventService,
+        IBackgroundJobService backgroundJob,
+        IDateTime dateTime) : base(options)
     {
-        private readonly IApplicationUserService _currentUserService;
-        private readonly IDateTime               _dateTime;
-        private readonly IDomainEventService     _domainEventService;
-        private readonly IBackgroundJobService   _backgroundJob;
-        private          IDbContextTransaction   _currentTransaction;
+        _currentUserService = currentUserService;
+        _domainEventService = domainEventService;
+        _backgroundJob      = backgroundJob;
+        _dateTime           = dateTime;
+    }
 
-        public ApplicationDbContext(
-            DbContextOptions options,
-            IApplicationUserService currentUserService,
-            IDomainEventService domainEventService,
-            IBackgroundJobService backgroundJob,
-            IDateTime dateTime) : base(options)
-        {
-            _currentUserService = currentUserService;
-            _domainEventService = domainEventService;
-            _backgroundJob      = backgroundJob;
-            _dateTime           = dateTime;
-        }
+    public DbSet<TSession> Sessions => Set<TSession>();
 
-        public DbSet<TSession> Sessions => Set<TSession>();
-
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.CreatedBy = _currentUserService.Id;
-                        entry.Entity.Created   = _dateTime.Now;
-                        break;
-
-                    case EntityState.Modified:
-                        entry.Entity.LastModifiedBy = _currentUserService.Id;
-                        entry.Entity.LastModified   = _dateTime.Now;
-                        break;
-
-                    case EntityState.Detached:
-                    case EntityState.Unchanged:
-                    case EntityState.Deleted:
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-            var result = await base.SaveChangesAsync(cancellationToken);
-
-            await TriggerDomainEventHandlers();
-
-            return result;
-        }
-
-        public Task TriggerDomainEventHandlers(params DomainEvent[] domainEvents)
-        {
-            var tasks = GetDomainEventHandlersAsTasks(domainEvents);
-
-            //if (tasks.Any()) _backgroundJob.Enqueue(() => FireAndForget(tasks));
-
-            return FireAndForget(tasks);
-        }
-
-        public static Task FireAndForget(IEnumerable<Task> tasks) => Task.WhenAll(tasks);
-
-        public async Task BeginTransactionAsync()
-        {
-            if (_currentTransaction is not null) return;
-
-            _currentTransaction = await base.Database
-                .BeginTransactionAsync(IsolationLevel.ReadCommitted)
-                .ConfigureAwait(false);
-        }
-
-        public async Task CommitTransactionAsync()
-        {
-            try
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+            switch (entry.State)
             {
-                await SaveChangesAsync().ConfigureAwait(false);
+                case EntityState.Added:
+                    entry.Entity.CreatedBy = _currentUserService.Id;
+                    entry.Entity.Created   = _dateTime.Now;
+                    break;
 
-                var task = _currentTransaction?.CommitAsync();
+                case EntityState.Modified:
+                    entry.Entity.LastModifiedBy = _currentUserService.Id;
+                    entry.Entity.LastModified   = _dateTime.Now;
+                    break;
 
-                if (task is not null) await task;
-            }
-            catch
-            {
-                RollbackTransaction();
-                throw;
-            }
-            finally
-            {
-                if (_currentTransaction is not null)
-                {
-                    _currentTransaction.Dispose();
-                    _currentTransaction = null;
-                }
-            }
-        }
+                case EntityState.Detached:
+                case EntityState.Unchanged:
+                case EntityState.Deleted:
+                    break;
 
-        public void RollbackTransaction()
-        {
-            try
-            {
-                _currentTransaction?.Rollback();
-            }
-            finally
-            {
-                if (_currentTransaction is not null)
-                {
-                    _currentTransaction.Dispose();
-                    _currentTransaction = null;
-                }
-            }
-        }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            builder.ApplyConfiguration(new SessionConfiguration<TSession>());
-        }
-
-        private IEnumerable<Task> GetDomainEventHandlersAsTasks(params DomainEvent[] domainEvents)
-        {
-            var events = ChangeTracker
-                .Entries<IHasDomainEvent>()
-                .Select(e => e.Entity.DomainEvents)
-                .SelectMany(e => e)
-                .Where(domainEvent => !domainEvent.IsPublished)
-                .ToList();
-
-            if (domainEvents.Any()) events.AddRange(domainEvents);
-
-            var tasks = new List<Task>();
-
-            foreach (var entity in events)
-            {
-                entity.IsPublished = true;
-                tasks.Add(_domainEventService.Publish(entity));
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            return tasks;
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        await TriggerDomainEventHandlers();
+
+        return result;
+    }
+
+    public Task TriggerDomainEventHandlers(params DomainEvent[] domainEvents)
+    {
+        var tasks = GetDomainEventHandlersAsTasks(domainEvents);
+
+        //if (tasks.Any()) _backgroundJob.Enqueue(() => FireAndForget(tasks));
+
+        return FireAndForget(tasks);
+    }
+
+    public static Task FireAndForget(IEnumerable<Task> tasks) => Task.WhenAll(tasks);
+
+    public async Task BeginTransactionAsync()
+    {
+        if (_currentTransaction is not null) return;
+
+        _currentTransaction = await base.Database
+            .BeginTransactionAsync(IsolationLevel.ReadCommitted)
+            .ConfigureAwait(false);
+    }
+
+    public async Task CommitTransactionAsync()
+    {
+        try
+        {
+            await SaveChangesAsync().ConfigureAwait(false);
+
+            var task = _currentTransaction?.CommitAsync();
+
+            if (task is not null) await task;
         }
+        catch
+        {
+            RollbackTransaction();
+            throw;
+        }
+        finally
+        {
+            if (_currentTransaction is not null)
+            {
+                _currentTransaction.Dispose();
+                _currentTransaction = null;
+            }
+        }
+    }
+
+    public void RollbackTransaction()
+    {
+        try
+        {
+            _currentTransaction?.Rollback();
+        }
+        finally
+        {
+            if (_currentTransaction is not null)
+            {
+                _currentTransaction.Dispose();
+                _currentTransaction = null;
+            }
+        }
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.ApplyConfiguration(new SessionConfiguration<TSession>());
+    }
+
+    private IEnumerable<Task> GetDomainEventHandlersAsTasks(params DomainEvent[] domainEvents)
+    {
+        var events = ChangeTracker
+            .Entries<IHasDomainEvent>()
+            .Select(e => e.Entity.DomainEvents)
+            .SelectMany(e => e)
+            .Where(domainEvent => !domainEvent.IsPublished)
+            .ToList();
+
+        if (domainEvents.Any()) events.AddRange(domainEvents);
+
+        var tasks = new List<Task>();
+
+        foreach (var entity in events)
+        {
+            entity.IsPublished = true;
+            tasks.Add(_domainEventService.Publish(entity));
+        }
+
+        return tasks;
     }
 }

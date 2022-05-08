@@ -1,16 +1,15 @@
-namespace Mesawer.ApplicationLayer.Enums
+namespace Mesawer.ApplicationLayer.Enums;
+
+public enum FileType
 {
-    public enum FileType
-    {
-        Picture,
-        Audio,
-        Video,
-        Pdf,
-        Document,
-        Text,
-        Xml,
-        Html,
-        Svg,
-        Utilities
-    }
+    Picture,
+    Audio,
+    Video,
+    Pdf,
+    Document,
+    Text,
+    Xml,
+    Html,
+    Svg,
+    Utilities
 }

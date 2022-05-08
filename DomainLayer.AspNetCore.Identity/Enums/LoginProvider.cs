@@ -1,10 +1,9 @@
-namespace Mesawer.DomainLayer.AspNetCore.Identity.Enums
+namespace Mesawer.DomainLayer.AspNetCore.Identity.Enums;
+
+public enum LoginProvider
 {
-    public enum LoginProvider
-    {
-        Google,
-        Facebook,
-        Apple,
-        Twitter
-    }
+    Google,
+    Facebook,
+    Apple,
+    Twitter
 }

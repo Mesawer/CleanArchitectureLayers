@@ -1,11 +1,10 @@
 using Mesawer.ApplicationLayer.Enums;
 using Mesawer.ApplicationLayer.Models;
 
-namespace Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces
+namespace Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
+
+public interface ITokenValidatorService
 {
-    public interface ITokenValidatorService
-    {
-        bool Verify(TokenType type, string userId, string token);
-        TokenObject Validate(TokenType type, string userId, string token);
-    }
+    bool Verify(TokenType type, string userId, string token);
+    TokenObject Validate(TokenType type, string userId, string token);
 }

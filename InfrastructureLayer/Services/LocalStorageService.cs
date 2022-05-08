@@ -6,84 +6,83 @@ using System.Threading.Tasks;
 using Mesawer.ApplicationLayer.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace Mesawer.InfrastructureLayer.Services
+namespace Mesawer.InfrastructureLayer.Services;
+
+public class LocalStorageService : IStorageService
 {
-    public class LocalStorageService : IStorageService
+    private readonly IStorageLocationService _storageLocation;
+
+    public LocalStorageService(IStorageLocationService storageLocation) => _storageLocation = storageLocation;
+
+    public async Task<string> SaveAsync(string type, byte[] file, string fileName = null)
     {
-        private readonly IStorageLocationService _storageLocation;
+        var directory = _storageLocation.GetPath(type);
 
-        public LocalStorageService(IStorageLocationService storageLocation) => _storageLocation = storageLocation;
+        Directory.CreateDirectory(directory);
 
-        public async Task<string> SaveAsync(string type, byte[] file, string fileName = null)
-        {
-            var directory = _storageLocation.GetPath(type);
+        var saveName = fileName ?? Guid.NewGuid().ToString("N") + ".txt";
 
-            Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, saveName);
 
-            var saveName = fileName ?? Guid.NewGuid().ToString("N") + ".txt";
+        await using var fileStream = File.Create(path);
+        await fileStream.WriteAsync(file);
 
-            var path = Path.Combine(directory, saveName);
+        return saveName;
+    }
 
-            await using var fileStream = File.Create(path);
-            await fileStream.WriteAsync(file);
+    public Task<(string saveName, string displayName)> SaveAsync(string type, IFormFile file)
+        => SaveAsync(file, _storageLocation.GetPath(type));
 
-            return saveName;
-        }
+    public Task DeleteAsync(string type, string fileName)
+        => Task.Run(() => Delete(_storageLocation.GetPath(type), fileName));
 
-        public Task<(string saveName, string displayName)> SaveAsync(string type, IFormFile file)
-            => SaveAsync(file, _storageLocation.GetPath(type));
+    public Task<bool> DeleteIfExistsAsync(string type, string fileName)
+        => Task.Run(() => DeleteIfExists(_storageLocation.GetPath(type), fileName));
 
-        public Task DeleteAsync(string type, string fileName)
-            => Task.Run(() => Delete(_storageLocation.GetPath(type), fileName));
+    public Task<byte[]> DownloadAsync(string type, string fileName)
+    {
+        var path = Path.Combine(_storageLocation.GetPath(type), fileName);
 
-        public Task<bool> DeleteIfExistsAsync(string type, string fileName)
-            => Task.Run(() => DeleteIfExists(_storageLocation.GetPath(type), fileName));
+        return File.Exists(path) ? File.ReadAllBytesAsync(path) : throw new FileNotFoundException();
+    }
 
-        public Task<byte[]> DownloadAsync(string type, string fileName)
-        {
-            var path = Path.Combine(_storageLocation.GetPath(type), fileName);
+    private static void Delete(string directory, string fileName) => File.Delete(Path.Combine(directory, fileName));
 
-            return File.Exists(path) ? File.ReadAllBytesAsync(path) : throw new FileNotFoundException();
-        }
+    public static bool DeleteIfExists(string directory, string fileName)
+    {
+        var path = Path.Combine(directory, fileName);
 
-        private static void Delete(string directory, string fileName) => File.Delete(Path.Combine(directory, fileName));
+        if (!File.Exists(path)) return false;
 
-        public static bool DeleteIfExists(string directory, string fileName)
-        {
-            var path = Path.Combine(directory, fileName);
+        File.Delete(path);
 
-            if (!File.Exists(path)) return false;
+        return true;
+    }
 
-            File.Delete(path);
+    private static async Task<(string saveName, string displayName)> SaveAsync(IFormFile formFile, string directory)
+    {
+        var untrustedFileName = Path.GetFileName(formFile.Name);
+        var ext               = $".{formFile.ContentType.Split("/").Last().Split('+').First()}";
 
-            return true;
-        }
+        if (string.IsNullOrWhiteSpace(directory) ||
+            string.IsNullOrWhiteSpace(untrustedFileName) ||
+            formFile.Length == 0)
+            throw new ArgumentException();
 
-        private static async Task<(string saveName, string displayName)> SaveAsync(IFormFile formFile, string directory)
-        {
-            var untrustedFileName = Path.GetFileName(formFile.Name);
-            var ext               = $".{formFile.ContentType.Split("/").Last().Split('+').First()}";
+        // Create the directory if not exist
+        Directory.CreateDirectory(directory);
 
-            if (string.IsNullOrWhiteSpace(directory) ||
-                string.IsNullOrWhiteSpace(untrustedFileName) ||
-                formFile.Length == 0)
-                throw new ArgumentException();
+        // Don't trust the file name sent by the client. To display
+        // the file name, HTML-encode the value.
+        var trustedFileNameForDisplay = WebUtility.HtmlEncode(formFile.FileName) + ext;
 
-            // Create the directory if not exist 
-            Directory.CreateDirectory(directory);
+        var saveName = Guid.NewGuid().ToString("N") + ext;
 
-            // Don't trust the file name sent by the client. To display
-            // the file name, HTML-encode the value.
-            var trustedFileNameForDisplay = WebUtility.HtmlEncode(formFile.FileName) + ext;
+        var path = Path.Combine(directory, saveName);
 
-            var saveName = Guid.NewGuid().ToString("N") + ext;
+        await using var fileStream = File.Create(path);
+        await formFile.CopyToAsync(fileStream);
 
-            var path = Path.Combine(directory, saveName);
-
-            await using var fileStream = File.Create(path);
-            await formFile.CopyToAsync(fileStream);
-
-            return (saveName, trustedFileNameForDisplay);
-        }
+        return (saveName, trustedFileNameForDisplay);
     }
 }

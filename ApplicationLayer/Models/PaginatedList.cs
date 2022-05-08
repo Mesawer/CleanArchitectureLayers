@@ -6,60 +6,59 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Mesawer.ApplicationLayer.Models
+namespace Mesawer.ApplicationLayer.Models;
+
+public class PaginatedList<T>
 {
-    public class PaginatedList<T>
+    public PageInfo PageInfo { get; }
+
+    public List<T> Items { get; }
+
+    private PaginatedList()
     {
-        public PageInfo PageInfo { get; }
+        PageInfo = PageInfo.Empty();
+        Items    = new List<T>();
+    }
 
-        public List<T> Items { get; }
+    public PaginatedList(List<T> items, PageInfo pageInfo)
+    {
+        PageInfo = pageInfo;
+        Items    = items;
+    }
 
-        private PaginatedList()
-        {
-            PageInfo = PageInfo.Empty();
-            Items    = new List<T>();
-        }
+    public static async Task<PaginatedList<TDto>> CreateAsync<TDto>(
+        IQueryable<T> source,
+        Expression<Func<T, TDto>> map,
+        PagingOptionsRequest request,
+        bool all,
+        CancellationToken ct)
+    {
+        var count = await source.CountAsync(ct);
 
-        public PaginatedList(List<T> items, PageInfo pageInfo)
-        {
-            PageInfo = pageInfo;
-            Items    = items;
-        }
+        if (count == 0) return new PaginatedList<TDto>();
 
-        public static async Task<PaginatedList<TDto>> CreateAsync<TDto>(
-            IQueryable<T> source,
-            Expression<Func<T, TDto>> map,
-            PagingOptionsRequest request,
-            bool all,
-            CancellationToken ct)
-        {
-            var count = await source.CountAsync(ct);
+        var items = await request
+            .Handle(source, all)
+            .Select(map)
+            .ToListAsync(ct);
 
-            if (count == 0) return new PaginatedList<TDto>();
+        return new PaginatedList<TDto>(items, request.GetPageInfo(count));
+    }
 
-            var items = await request
-                .Handle(source, all)
-                .Select(map)
-                .ToListAsync(ct);
+    public static async Task<PaginatedList<T>> CreateAsync(
+        IQueryable<T> source,
+        PagingOptionsRequest request,
+        bool all,
+        CancellationToken ct)
+    {
+        var count = await source.CountAsync(ct);
 
-            return new PaginatedList<TDto>(items, request.GetPageInfo(count));
-        }
+        if (count == 0) return new PaginatedList<T>();
 
-        public static async Task<PaginatedList<T>> CreateAsync(
-            IQueryable<T> source,
-            PagingOptionsRequest request,
-            bool all,
-            CancellationToken ct)
-        {
-            var count = await source.CountAsync(ct);
+        var items = await request
+            .Handle(source, all)
+            .ToListAsync(ct);
 
-            if (count == 0) return new PaginatedList<T>();
-
-            var items = await request
-                .Handle(source, all)
-                .ToListAsync(ct);
-
-            return new PaginatedList<T>(items, request.GetPageInfo(count));
-        }
+        return new PaginatedList<T>(items, request.GetPageInfo(count));
     }
 }

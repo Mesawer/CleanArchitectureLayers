@@ -1,8 +1,7 @@
-namespace Mesawer.DomainLayer.Models
+namespace Mesawer.DomainLayer.Models;
+
+public enum Language
 {
-    public enum Language
-    {
-        En = 0,
-        Ar = 1
-    }
+    En = 0,
+    Ar = 1
 }

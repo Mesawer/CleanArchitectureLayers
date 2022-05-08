@@ -1,7 +1,6 @@
-namespace Mesawer.DomainLayer.Exceptions
+namespace Mesawer.DomainLayer.Exceptions;
+
+public class AmbiguousMatchException : DomainException
 {
-    public class AmbiguousMatchException : DomainException
-    {
-        public AmbiguousMatchException(string message) : base(message) { }
-    }
+    public AmbiguousMatchException(string message) : base(message) { }
 }

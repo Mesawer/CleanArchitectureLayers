@@ -1,38 +1,37 @@
 using Mesawer.DomainLayer.ValueObjects;
 using static Mesawer.ApplicationLayer.Constants;
 
-namespace Mesawer.ApplicationLayer.Models
+namespace Mesawer.ApplicationLayer.Models;
+
+public class FullNameDto
 {
-    public class FullNameDto
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+
+    public FullName ToFullName()
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        var firstName = FirstName.Length >= NameMaxLength
+            ? FirstName[..NameMaxLength]
+            : FirstName;
 
-        public FullName ToFullName()
-        {
-            var firstName = FirstName.Length >= NameMaxLength
-                ? FirstName[..NameMaxLength]
-                : FirstName;
+        var lastName = LastName.Length >= NameMaxLength
+            ? LastName[..NameMaxLength]
+            : LastName;
 
-            var lastName = LastName.Length >= NameMaxLength
-                ? LastName[..NameMaxLength]
-                : LastName;
-
-            return (FullName) (firstName, lastName);
-        }
-
-        public static FullNameDto Create(string firstName, string lastName)
-            => new()
-            {
-                FirstName = firstName,
-                LastName  = lastName
-            };
-
-        public static FullNameDto Create(FullName source)
-            => new()
-            {
-                FirstName = source.FirstName,
-                LastName  = source.LastName
-            };
+        return (FullName) (firstName, lastName);
     }
+
+    public static FullNameDto Create(string firstName, string lastName)
+        => new()
+        {
+            FirstName = firstName,
+            LastName  = lastName
+        };
+
+    public static FullNameDto Create(FullName source)
+        => new()
+        {
+            FirstName = source.FirstName,
+            LastName  = source.LastName
+        };
 }

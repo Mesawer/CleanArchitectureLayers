@@ -6,128 +6,127 @@ using FluentValidation;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.DomainLayer.ValueObjects;
 
-namespace Mesawer.ApplicationLayer.Models
+namespace Mesawer.ApplicationLayer.Models;
+
+public class PagingOptionsRequest
 {
-    public class PagingOptionsRequest
+    public int? Offset { get; set; }
+
+    public int? PageIndex { get; set; }
+
+    public string Search { get; set; }
+
+    public bool Ascending { get; set; }
+    public string SortBy { get; set; }
+
+    public class PagingOptionsValidator<T> : AbstractValidator<T> where T : PagingOptionsRequest
     {
-        public int? Offset { get; set; }
-
-        public int? PageIndex { get; set; }
-
-        public string Search { get; set; }
-
-        public bool Ascending { get; set; }
-        public string SortBy { get; set; }
-
-        public class PagingOptionsValidator<T> : AbstractValidator<T> where T : PagingOptionsRequest
+        public PagingOptionsValidator()
         {
-            public PagingOptionsValidator()
-            {
-                RuleFor(c => c.Offset)
-                    .InclusiveBetween(0, 99999);
+            RuleFor(c => c.Offset)
+                .InclusiveBetween(0, 99999);
 
-                RuleFor(c => c.PageIndex)
-                    .InclusiveBetween(-99999, 99999);
-            }
+            RuleFor(c => c.PageIndex)
+                .InclusiveBetween(-99999, 99999);
+        }
+    }
+
+    public IQueryable<T> Handle<T>(IQueryable<T> query, bool all)
+    {
+        var keySelector = typeof(T).CreateSelectorExpression<T>(SortBy)?.Body.ToString();
+
+        if (keySelector is not null)
+        {
+            var propertyName = keySelector[(keySelector.IndexOf('.') + 1)..];
+
+            query = Ascending
+                ? query.OrderBy(propertyName).AsQueryable()
+                : query.OrderByDescending(propertyName).AsQueryable();
         }
 
-        public IQueryable<T> Handle<T>(IQueryable<T> query, bool all)
-        {
-            var keySelector = typeof(T).CreateSelectorExpression<T>(SortBy)?.Body.ToString();
+        var (asc, page) = GetPageIndex();
+        var offset = GetOffset();
 
-            if (keySelector is not null)
+        if (all) return query;
+
+        return asc
+            ? query.Skip(page * offset).Take(offset)
+            : query.SkipLast(Math.Abs(page) * offset).TakeLast(offset);
+    }
+
+    public IQueryable<T> ApplyQuery<T>(
+        IQueryable<T> queryable,
+        IEnumerable<Expression<Func<T, object>>> expressions)
+    {
+        var list = expressions?.ToList() ?? new List<Expression<Func<T, object>>>();
+
+        if (string.IsNullOrEmpty(Search) || !list.Any()) return queryable;
+
+        var search = Search.Trim().ToLower();
+
+        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), 0, new[] { typeof(string) })!;
+
+        var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), 0, Array.Empty<Type>())!;
+
+        var obj = Expression.Parameter(typeof(T), list.First().Parameters.First().Name);
+
+        var comparisonExpressions = list
+            .SelectMany(expression =>
             {
-                var propertyName = keySelector[(keySelector.IndexOf('.') + 1)..];
+                var copiedExpression = ExpressionConverter<T>.Convert(expression, obj);
 
-                query = Ascending
-                    ? query.OrderBy(propertyName).AsQueryable()
-                    : query.OrderByDescending(propertyName).AsQueryable();
-            }
+                var bodyType = copiedExpression.Body.Type;
 
-            var (asc, page) = GetPageIndex();
-            var offset = GetOffset();
-
-            if (all) return query;
-
-            return asc
-                ? query.Skip(page * offset).Take(offset)
-                : query.SkipLast(Math.Abs(page) * offset).TakeLast(offset);
-        }
-
-        public IQueryable<T> ApplyQuery<T>(
-            IQueryable<T> queryable,
-            IEnumerable<Expression<Func<T, object>>> expressions)
-        {
-            var list = expressions?.ToList() ?? new List<Expression<Func<T, object>>>();
-
-            if (string.IsNullOrEmpty(Search) || !list.Any()) return queryable;
-
-            var search = Search.Trim().ToLower();
-
-            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), 0, new[] { typeof(string) })!;
-
-            var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), 0, Array.Empty<Type>())!;
-
-            var obj = Expression.Parameter(typeof(T), list.First().Parameters.First().Name);
-
-            var comparisonExpressions = list
-                .SelectMany(expression =>
+                if (bodyType == typeof(LocalizedString))
                 {
-                    var copiedExpression = ExpressionConverter<T>.Convert(expression, obj);
+                    var localExpressions = copiedExpression.BuildExpressions<T, LocalizedString>();
 
-                    var bodyType = copiedExpression.Body.Type;
+                    return localExpressions.Select(AppendMethods).ToList();
+                }
 
-                    if (bodyType == typeof(LocalizedString))
-                    {
-                        var localExpressions = copiedExpression.BuildExpressions<T, LocalizedString>();
+                if (bodyType == typeof(FullName))
+                {
+                    var localExpressions = copiedExpression.BuildExpressions<T, FullName>();
 
-                        return localExpressions.Select(AppendMethods).ToList();
-                    }
+                    return localExpressions.Select(AppendMethods).ToList();
+                }
 
-                    if (bodyType == typeof(FullName))
-                    {
-                        var localExpressions = copiedExpression.BuildExpressions<T, FullName>();
+                Expression AppendMethods(Expression ex)
+                {
+                    var afterToLower = Expression.Call(ex, toLowerMethod);
 
-                        return localExpressions.Select(AppendMethods).ToList();
-                    }
+                    return Expression.Call(afterToLower, containsMethod, Expression.Constant(search));
+                }
 
-                    Expression AppendMethods(Expression ex)
-                    {
-                        var afterToLower = Expression.Call(ex, toLowerMethod);
+                return new List<Expression> { AppendMethods(copiedExpression.Body) };
+            })
+            .ToArray();
 
-                        return Expression.Call(afterToLower, containsMethod, Expression.Constant(search));
-                    }
+        var orExpression = ReflectionExtensions.Or(comparisonExpressions);
 
-                    return new List<Expression> { AppendMethods(copiedExpression.Body) };
-                })
-                .ToArray();
+        var lambdaExpression = Expression.Lambda<Func<T, bool>>(orExpression, obj);
 
-            var orExpression = ReflectionExtensions.Or(comparisonExpressions);
+        return queryable
+            .Where(lambdaExpression)
+            .AsQueryable();
+    }
 
-            var lambdaExpression = Expression.Lambda<Func<T, bool>>(orExpression, obj);
-
-            return queryable
-                .Where(lambdaExpression)
-                .AsQueryable();
-        }
-
-        public PageInfo GetPageInfo(int total)
-            => new()
-            {
-                PageIndex  = PageIndex ?? default,
-                TotalPages = (int) Math.Ceiling(total / (double) GetOffset()),
-                TotalCount = total,
-            };
-
-        private int GetOffset() => Offset is null or <= 0 ? 25 : (int) Offset;
-
-        private (bool asc, int page) GetPageIndex()
+    public PageInfo GetPageInfo(int total)
+        => new()
         {
-            var page = PageIndex ?? default;
+            PageIndex  = PageIndex ?? default,
+            TotalPages = (int) Math.Ceiling(total / (double) GetOffset()),
+            TotalCount = total,
+        };
 
-            if (page == default) return (true, page);
+    private int GetOffset() => Offset is null or <= 0 ? 25 : (int) Offset;
 
-            return page < 0 ? (false, page + 1) : (true, page);
-        }
+    private (bool asc, int page) GetPageIndex()
+    {
+        var page = PageIndex ?? default;
+
+        if (page == default) return (true, page);
+
+        return page < 0 ? (false, page + 1) : (true, page);
     }
 }

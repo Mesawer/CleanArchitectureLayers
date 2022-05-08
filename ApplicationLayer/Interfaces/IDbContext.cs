@@ -4,20 +4,19 @@ using Mesawer.DomainLayer.Entities;
 using Mesawer.DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Mesawer.ApplicationLayer.Interfaces
+namespace Mesawer.ApplicationLayer.Interfaces;
+
+public interface IDbContext<TSession> where TSession : Session
 {
-    public interface IDbContext<TSession> where TSession : Session
-    {
-        public DbSet<TSession> Sessions { get; }
+    public DbSet<TSession> Sessions { get; }
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
-        Task TriggerDomainEventHandlers(params DomainEvent[] domainEvents);
+    Task TriggerDomainEventHandlers(params DomainEvent[] domainEvents);
 
-        Task BeginTransactionAsync();
+    Task BeginTransactionAsync();
 
-        Task CommitTransactionAsync();
+    Task CommitTransactionAsync();
 
-        void RollbackTransaction();
-    }
+    void RollbackTransaction();
 }

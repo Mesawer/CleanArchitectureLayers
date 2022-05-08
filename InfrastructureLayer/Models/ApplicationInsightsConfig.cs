@@ -1,10 +1,9 @@
-namespace Mesawer.InfrastructureLayer.Models
+namespace Mesawer.InfrastructureLayer.Models;
+
+public class ApplicationInsightsConfig
 {
-    public class ApplicationInsightsConfig
-    {
-        /// <summary>
-        /// Gets or sets the default instrumentation key for the application.
-        /// </summary>
-        public string InstrumentationKey { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets the default instrumentation key for the application.
+    /// </summary>
+    public string InstrumentationKey { get; set; }
 }

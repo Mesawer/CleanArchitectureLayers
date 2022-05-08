@@ -1,39 +1,35 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mesawer.ApplicationLayer.Helpers
+namespace Mesawer.ApplicationLayer.Helpers;
+
+public class ProjectionEqualityComparer<TSource, TKey>
+    : IEqualityComparer<TSource>
 {
-    public class ProjectionEqualityComparer<TSource, TKey>
-        : IEqualityComparer<TSource>
+    private readonly Func<TSource, TKey>     _projection;
+    private readonly IEqualityComparer<TKey> _comparer;
+
+    public ProjectionEqualityComparer(
+        Func<TSource, TKey> projection,
+        IEqualityComparer<TKey> comparer = null)
     {
-        private readonly Func<TSource, TKey>     _projection;
-        private readonly IEqualityComparer<TKey> _comparer;
+        _comparer   = comparer ?? EqualityComparer<TKey>.Default;
+        _projection = projection ?? throw new ArgumentNullException(nameof(projection));
+    }
 
-        public ProjectionEqualityComparer(Func<TSource, TKey> projection)
-            : this(projection, null) { }
+    public bool Equals(TSource x, TSource y)
+    {
+        if (x is null && y is null) return true;
 
-        public ProjectionEqualityComparer(
-            Func<TSource, TKey> projection,
-            IEqualityComparer<TKey> comparer)
-        {
-            _comparer   = comparer ?? EqualityComparer<TKey>.Default;
-            _projection = projection ?? throw new ArgumentNullException(nameof(projection));
-        }
+        if (x is null || y is null) return false;
 
-        public bool Equals(TSource x, TSource y)
-        {
-            if (x is null && y is null) return true;
+        return _comparer.Equals(_projection(x), _projection(y));
+    }
 
-            if (x is null || y is null) return false;
+    public int GetHashCode(TSource obj)
+    {
+        if (obj is null) throw new ArgumentNullException(nameof(obj));
 
-            return _comparer.Equals(_projection(x), _projection(y));
-        }
-
-        public int GetHashCode(TSource obj)
-        {
-            if (obj is null) throw new ArgumentNullException(nameof(obj));
-
-            return _comparer.GetHashCode(_projection(obj));
-        }
+        return _comparer.GetHashCode(_projection(obj));
     }
 }

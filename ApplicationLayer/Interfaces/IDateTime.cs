@@ -1,9 +1,8 @@
 using System;
 
-namespace Mesawer.ApplicationLayer.Interfaces
+namespace Mesawer.ApplicationLayer.Interfaces;
+
+public interface IDateTime
 {
-    public interface IDateTime
-    {
-        DateTime Now { get; }
-    }
+    DateTime Now { get; }
 }

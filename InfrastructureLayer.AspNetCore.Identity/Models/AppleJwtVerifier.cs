@@ -10,184 +10,183 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Models
+namespace Mesawer.InfrastructureLayer.AspNetCore.Identity.Models;
+
+public class AppleJwtVerifier
 {
-    public class AppleJwtVerifier
+    private readonly IConfiguration _configuration;
+
+    public AppleJwtVerifier(IConfiguration configuration) => _configuration = configuration;
+
+    public async Task<AppleInfo> Verify(string token)
     {
-        private readonly IConfiguration _configuration;
+        var clientId = _configuration["AppleClientId"];
 
-        public AppleJwtVerifier(IConfiguration configuration) => _configuration = configuration;
+        const string issuer = "https://appleid.apple.com";
 
-        public async Task<AppleInfo> Verify(string token)
-        {
-            var clientId = _configuration["AppleClientId"];
+        var validSignature = await VerifySignature(token);
 
-            const string issuer = "https://appleid.apple.com";
+        if (!validSignature) return null;
 
-            var validSignature = await VerifySignature(token);
+        var data = GetData(token);
 
-            if (!validSignature) return null;
+        var validNonce = data.NonceSupported;
 
-            var data = GetData(token);
+        if (!validNonce) return null;
 
-            var validNonce = data.NonceSupported;
+        var validIssuer = data.Issuer == issuer;
 
-            if (!validNonce) return null;
+        if (!validIssuer) return null;
 
-            var validIssuer = data.Issuer == issuer;
+        var validAudience = data.Audience == clientId;
 
-            if (!validIssuer) return null;
+        if (!validAudience) return null;
 
-            var validAudience = data.Audience == clientId;
+        var date = DateTime.UnixEpoch.AddMilliseconds(data.Expiration * 1000);
 
-            if (!validAudience) return null;
+        return date >= DateTime.UtcNow ? data : null;
+    }
 
-            var date = DateTime.UnixEpoch.AddMilliseconds(data.Expiration * 1000);
+    private static async Task<bool> VerifySignature(string token)
+    {
+        var client   = new HttpClient();
+        var response = await client.GetAsync("https://appleid.apple.com/auth/keys");
 
-            return date >= DateTime.UtcNow ? data : null;
-        }
+        if (!response.IsSuccessStatusCode) return false;
 
-        private static async Task<bool> VerifySignature(string token)
-        {
-            var client   = new HttpClient();
-            var response = await client.GetAsync("https://appleid.apple.com/auth/keys");
+        var content = await response.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode) return false;
+        var keys = JsonConvert.DeserializeObject<AppleKey>(content)?.Keys;
 
-            var content = await response.Content.ReadAsStringAsync();
+        if (keys is null) return false;
 
-            var keys = JsonConvert.DeserializeObject<AppleKey>(content)?.Keys;
+        return keys
+            .Select(key => VerifySignature(key.Modulus, key.Exponent, token))
+            .Any(value => value);
+    }
 
-            if (keys is null) return false;
+    private static bool VerifySignature(string modulus, string exponent, string token)
+    {
+        var tokenParts = token.Split('.');
 
-            return keys
-                .Select(key => VerifySignature(key.Modulus, key.Exponent, token))
-                .Any(value => value);
-        }
-
-        private static bool VerifySignature(string modulus, string exponent, string token)
-        {
-            var tokenParts = token.Split('.');
-
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(
-                new RSAParameters
-                {
-                    Modulus  = FromBase64Url(modulus),
-                    Exponent = FromBase64Url(exponent)
-                });
-
-            var sha256 = SHA256.Create();
-            var hash   = sha256.ComputeHash(Encoding.UTF8.GetBytes(tokenParts[0] + '.' + tokenParts[1]));
-
-            var rsaDeformatter = new RSAPKCS1SignatureDeformatter(rsa);
-            rsaDeformatter.SetHashAlgorithm("SHA256");
-
-            return rsaDeformatter.VerifySignature(hash, FromBase64Url(tokenParts[2]));
-
-            static byte[] FromBase64Url(string base64Url)
+        var rsa = new RSACryptoServiceProvider();
+        rsa.ImportParameters(
+            new RSAParameters
             {
-                var padded = base64Url.Length % 4 == 0
-                    ? base64Url
-                    : base64Url + "===="[(base64Url.Length % 4)..];
-                var base64 = padded.Replace("_", "/")
-                    .Replace("-", "+");
-                return Convert.FromBase64String(base64);
-            }
-        }
+                Modulus  = FromBase64Url(modulus),
+                Exponent = FromBase64Url(exponent)
+            });
 
-        private static AppleInfo GetData(string token)
+        var sha256 = SHA256.Create();
+        var hash   = sha256.ComputeHash(Encoding.UTF8.GetBytes(tokenParts[0] + '.' + tokenParts[1]));
+
+        var rsaDeformatter = new RSAPKCS1SignatureDeformatter(rsa);
+        rsaDeformatter.SetHashAlgorithm("SHA256");
+
+        return rsaDeformatter.VerifySignature(hash, FromBase64Url(tokenParts[2]));
+
+        static byte[] FromBase64Url(string base64Url)
         {
-            var handler   = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token);
-            var claims    = jsonToken is JwtSecurityToken tokenS ? tokenS.Claims.ToList() : null;
-
-            if (claims is null) return null;
-
-            var properties = typeof(AppleInfo)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .ToList();
-
-            var expiration     = FindClaim(nameof(AppleInfo.Expiration));
-            var emailVerified  = FindClaim(nameof(AppleInfo.EmailVerified));
-            var name           = FindClaim(nameof(AppleInfo.Name));
-            var nonceSupported = FindClaim(nameof(AppleInfo.NonceSupported));
-
-            var info = new AppleInfo
-            {
-                Id             = FindClaim(nameof(AppleInfo.Id)),
-                Issuer         = FindClaim(nameof(AppleInfo.Issuer)),
-                Audience       = FindClaim(nameof(AppleInfo.Audience)),
-                Expiration     = expiration is not null ? Convert.ToInt64(expiration) : default,
-                Email          = FindClaim(nameof(AppleInfo.Email)),
-                EmailVerified  = emailVerified is not null ? Convert.ToBoolean(emailVerified) : default,
-                Name           = name is not null ? JsonConvert.DeserializeObject<AppleInfo.FullName>(name) : null,
-                NonceSupported = nonceSupported is not null && Convert.ToBoolean(nonceSupported),
-                Data           = claims.ToDictionary(c => c.Type, c => c.Value)
-            };
-
-            return info;
-
-            string FindClaim(string key)
-            {
-                var jsonName = properties.FirstOrDefault(c => c.Name == key)
-                    ?.GetCustomAttribute<JsonPropertyAttribute>()
-                    ?.PropertyName;
-
-                return jsonName is not null ? claims.FirstOrDefault(c => c.Type == jsonName)?.Value : null;
-            }
+            var padded = base64Url.Length % 4 == 0
+                ? base64Url
+                : base64Url + "===="[(base64Url.Length % 4)..];
+            var base64 = padded.Replace("_", "/")
+                .Replace("-", "+");
+            return Convert.FromBase64String(base64);
         }
     }
 
-    public class AppleKey
+    private static AppleInfo GetData(string token)
     {
-        public List<Key> Keys { get; set; }
+        var handler   = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token);
+        var claims    = jsonToken is JwtSecurityToken tokenS ? tokenS.Claims.ToList() : null;
 
-        public class Key
+        if (claims is null) return null;
+
+        var properties = typeof(AppleInfo)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .ToList();
+
+        var expiration     = FindClaim(nameof(AppleInfo.Expiration));
+        var emailVerified  = FindClaim(nameof(AppleInfo.EmailVerified));
+        var name           = FindClaim(nameof(AppleInfo.Name));
+        var nonceSupported = FindClaim(nameof(AppleInfo.NonceSupported));
+
+        var info = new AppleInfo
         {
-            [JsonProperty("n")]
-            public string Modulus { get; set; }
+            Id             = FindClaim(nameof(AppleInfo.Id)),
+            Issuer         = FindClaim(nameof(AppleInfo.Issuer)),
+            Audience       = FindClaim(nameof(AppleInfo.Audience)),
+            Expiration     = expiration is not null ? Convert.ToInt64(expiration) : default,
+            Email          = FindClaim(nameof(AppleInfo.Email)),
+            EmailVerified  = emailVerified is not null ? Convert.ToBoolean(emailVerified) : default,
+            Name           = name is not null ? JsonConvert.DeserializeObject<AppleInfo.FullName>(name) : null,
+            NonceSupported = nonceSupported is not null && Convert.ToBoolean(nonceSupported),
+            Data           = claims.ToDictionary(c => c.Type, c => c.Value)
+        };
 
-            [JsonProperty("e")]
-            public string Exponent { get; set; }
+        return info;
+
+        string FindClaim(string key)
+        {
+            var jsonName = properties.FirstOrDefault(c => c.Name == key)
+                ?.GetCustomAttribute<JsonPropertyAttribute>()
+                ?.PropertyName;
+
+            return jsonName is not null ? claims.FirstOrDefault(c => c.Type == jsonName)?.Value : null;
         }
     }
+}
 
-    public class AppleInfo
+public class AppleKey
+{
+    public List<Key> Keys { get; set; }
+
+    public class Key
     {
-        [JsonProperty("sub")]
-        public string Id { get; set; }
+        [JsonProperty("n")]
+        public string Modulus { get; set; }
 
-        [JsonProperty("iss")]
-        public string Issuer { get; set; }
+        [JsonProperty("e")]
+        public string Exponent { get; set; }
+    }
+}
 
-        [JsonProperty("aud")]
-        public string Audience { get; set; }
+public class AppleInfo
+{
+    [JsonProperty("sub")]
+    public string Id { get; set; }
 
-        [JsonProperty("exp")]
-        public long Expiration { get; set; }
+    [JsonProperty("iss")]
+    public string Issuer { get; set; }
 
-        [JsonProperty("email")]
-        public string Email { get; set; }
+    [JsonProperty("aud")]
+    public string Audience { get; set; }
 
-        [JsonProperty("email_verified")]
-        public bool EmailVerified { get; set; }
+    [JsonProperty("exp")]
+    public long Expiration { get; set; }
 
-        [JsonProperty("name")]
-        public FullName Name { get; set; }
+    [JsonProperty("email")]
+    public string Email { get; set; }
 
-        [JsonProperty("nonce_supported")]
-        public bool NonceSupported { get; set; }
+    [JsonProperty("email_verified")]
+    public bool EmailVerified { get; set; }
 
-        public Dictionary<string, string> Data { get; set; }
+    [JsonProperty("name")]
+    public FullName Name { get; set; }
 
-        public class FullName
-        {
-            [JsonProperty("firstName")]
-            public string FirstName { get; set; }
+    [JsonProperty("nonce_supported")]
+    public bool NonceSupported { get; set; }
 
-            [JsonProperty("lastName")]
-            public string LastName { get; set; }
-        }
+    public Dictionary<string, string> Data { get; set; }
+
+    public class FullName
+    {
+        [JsonProperty("firstName")]
+        public string FirstName { get; set; }
+
+        [JsonProperty("lastName")]
+        public string LastName { get; set; }
     }
 }

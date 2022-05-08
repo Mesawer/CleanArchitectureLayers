@@ -1,11 +1,10 @@
-namespace Mesawer.ApplicationLayer.Enums
+namespace Mesawer.ApplicationLayer.Enums;
+
+public enum TokenType
 {
-    public enum TokenType
-    {
-        ConfirmEmail,
-        ChangeEmail,
-        ResetPassword,
-        ConfirmPhoneNumber,
-        ChangePhoneNumber
-    }
+    ConfirmEmail,
+    ChangeEmail,
+    ResetPassword,
+    ConfirmPhoneNumber,
+    ChangePhoneNumber
 }

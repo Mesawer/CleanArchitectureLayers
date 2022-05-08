@@ -1,9 +1,8 @@
-namespace Mesawer.ApplicationLayer.AspNetCore.Identity.Models
-{
-    public class AuthResponse
-    {
-        public string Token { get; set; }
+namespace Mesawer.ApplicationLayer.AspNetCore.Identity.Models;
 
-        public string RefreshToken { get; set; }
-    }
+public class AuthResponse
+{
+    public string Token { get; set; }
+
+    public string RefreshToken { get; set; }
 }

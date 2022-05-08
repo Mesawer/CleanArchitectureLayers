@@ -142,7 +142,7 @@ namespace Mesawer.ApplicationLayer
             // in that % isn't illegal if it's the start of a %-encoded sequence https://stackoverflow.com/a/47636037/62600
 
             // no % characters, so avoid the regex overhead
-            if (!s.OrdinalContains("%")) return Uri.EscapeUriString(s);
+            if (!s.OrdinalContains("%")) return Uri.EscapeDataString(s);
 
             // pick out all %-hex-hex matches and avoid double-encoding
             return Regex.Replace(s,
@@ -151,7 +151,7 @@ namespace Mesawer.ApplicationLayer
                 {
                     var a = c.Groups[1].Value; // group 1 is a sequence with no %-encoding - encode illegal characters
                     var b = c.Groups[2].Value; // group 2 is a valid 3-character %-encoded sequence - leave it alone!
-                    return Uri.EscapeUriString(a) + b;
+                    return Uri.EscapeDataString(a) + b;
                 });
         }
 

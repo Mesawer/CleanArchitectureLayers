@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
 using Mesawer.ApplicationLayer.Models;
 
-namespace Mesawer.ApplicationLayer.Interfaces
+namespace Mesawer.ApplicationLayer.Interfaces;
+
+public interface IRazorRendererService
 {
-    public interface IRazorRendererService
-    {
-        Task<string> RenderAsync<TModel>(string viewName, TModel model) where TModel : EmailTemplate;
-    }
+    Task<string> RenderAsync<TModel>(string viewName, TModel model) where TModel : EmailTemplate;
 }
