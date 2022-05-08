@@ -45,5 +45,5 @@ jobs:
         run: |
           Get-ChildItem ./out -Filter "*.nupkg" || ForEach-Object {
             Write-Host "$($scriptName): Pushing $($_.Name)"
-            exec { & dotnet nuget push $_ --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }} }
+            dotnet nuget push $_ --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }}
           }
