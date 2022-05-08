@@ -43,7 +43,7 @@ jobs:
       - name: Push to NuGet 🚀
         shell: pwsh
         run: |
-          Get-ChildItem ./out -Filter "*.nupkg" || ForEach-Object {
-            Write-Host "$($scriptName): Pushing $($_.Name)"
-            dotnet nuget push $_ --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }}
+          $files = Get-ChildItem -Recurse
+          foreach ($file in $files) {
+            dotnet nuget push $file.FullName --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }}
           }
