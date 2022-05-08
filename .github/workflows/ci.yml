@@ -11,8 +11,6 @@ env:
 
 jobs:
   build-and-deploy:
-    name: Deploy to NuGet
-
     # Publish only if commit message start with 'Publish v'
     if: "startsWith(github.event.head_commit.message, 'Publish v')"
 
@@ -45,7 +43,7 @@ jobs:
       - name: Push to NuGet 🚀
         shell: pwsh
         run: |
-          Get-ChildItem ./out -Filter "*.nupkg" | ForEach-Object {
+          Get-ChildItem ./out -Filter "*.nupkg" || ForEach-Object {
             Write-Host "$($scriptName): Pushing $($_.Name)"
             exec { & dotnet nuget push $_ --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }} }
           }
