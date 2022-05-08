@@ -1,0 +1,45 @@
+name: Build and Deploy to NuGet
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOTNET_VERSION: '6.0.x'
+  NUGET_API_URL: https://api.nuget.org/v3/index.json
+
+jobs:
+  release:
+    name: Release
+    # Publish only if commit message start with 'Publish v'
+    if: "startWith(github.event.head_commit.message, 'Publish v')"
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          # Number of commits to fetch.
+          # 0 indicates all history for all branches and tags. (Default: 1)
+          fetch-depth: 0
+
+      - name: Setup
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Clean Solution 🧹
+        run: dotnet clean -c Release
+
+      - name: Build 🏗️
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: true
+          DOTNET_NOLOGO: 1
+        run: dotnet build -c Release
+
+      - name: Pack 📦
+        run: dotnet pack -c Release -o .out --no-build
+
+      - name: Push to NuGet 🚀
+        run: dotnet nuget push ./out/*.nupkg --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }}
