@@ -10,8 +10,9 @@ env:
   NUGET_API_URL: https://api.nuget.org/v3/index.json
 
 jobs:
-  release:
-    name: Release
+  build-and-deploy:
+    name: Deploy to NuGet
+
     # Publish only if commit message start with 'Publish v'
     if: "startsWith(github.event.head_commit.message, 'Publish v')"
 
@@ -39,7 +40,12 @@ jobs:
         run: dotnet build -c Release
 
       - name: Pack 📦
-        run: dotnet pack -c Release -o .out --no-build
+        run: dotnet pack -c Release -o ./out --no-build
 
       - name: Push to NuGet 🚀
-        run: dotnet nuget push ./out/*.nupkg --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }}
+        shell: pwsh
+        run: |
+          Get-ChildItem ./out -Filter "*.nupkg" | ForEach-Object {
+            Write-Host "$($scriptName): Pushing $($_.Name)"
+            exec { & dotnet nuget push $_ --source ${{ env.NUGET_API_URL }} --api-key ${{ secrets.NUGET_API_KEY }} }
+          }
