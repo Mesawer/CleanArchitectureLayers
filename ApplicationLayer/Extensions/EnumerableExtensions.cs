@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mesawer.ApplicationLayer.Helpers;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
@@ -19,12 +18,6 @@ public static class EnumerableExtensions
 
         return enumerable.Select(c => method.InvokeProjectToMethod<TTarget>(c, optionalParameters));
     }
-
-    /// <summary>
-    /// Returns the distinct elements from a sequence using the passed in projection
-    /// </summary>
-    public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> enumerable, Func<T, TKey> projection)
-        => enumerable.Distinct(new ProjectionEqualityComparer<T, TKey>(projection));
 
     /// <summary>
     /// Maps an enumerable to key/value tuples
