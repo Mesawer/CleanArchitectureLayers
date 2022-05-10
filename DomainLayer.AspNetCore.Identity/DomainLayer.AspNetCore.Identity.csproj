@@ -5,23 +5,23 @@
     <RootNamespace>Mesawer.DomainLayer.AspNetCore.Identity</RootNamespace>
     <PackageId>Mesawer.DomainLayer.AspNetCore.Identity</PackageId>
     <Authors>Mesawer</Authors>
-    <Product/>
+    <Product />
     <Description>This library contains all the required reusable components for identity in the domain layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>mesawer, domain, layer, tiers, extensions, helpers, identity, aspnetcore</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.4"/>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.5" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <ProjectReference Include="..\DomainLayer\DomainLayer.csproj"/>
+    <ProjectReference Include="..\DomainLayer\DomainLayer.csproj" />
   </ItemGroup>
 
 </Project>
