@@ -32,7 +32,9 @@ public static class Database
         this EntityTypeBuilder<TEntity> entity,
         Expression<Func<TEntity, TLocalizedString>> navigationExpression,
         int maxLength = NameMaxLength) where TEntity : class where TLocalizedString : WeakLocalizedString
-        => entity.OwnsOne(navigationExpression, c => LocalizedNameMaxLengthTypeBuilder(c, maxLength));
+        => entity.OwnsOne(navigationExpression, c => LocalizedNameMaxLengthTypeBuilder(c, maxLength))
+            .Navigation(navigationExpression)
+            .IsRequired();
 
     public static void OwnsLocalizedString<TEntity, TDependentEntity>(
         this OwnedNavigationBuilder<TEntity, TDependentEntity> entity,
@@ -45,7 +47,9 @@ public static class Database
         Expression<Func<TDependentEntity, TLocalizedString>> navigationExpression,
         int maxLength = NameMaxLength)
         where TEntity : class where TDependentEntity : class where TLocalizedString : WeakLocalizedString
-        => entity.OwnsOne(navigationExpression, c => LocalizedNameMaxLengthTypeBuilder(c, maxLength));
+        => entity.OwnsOne(navigationExpression, c => LocalizedNameMaxLengthTypeBuilder(c, maxLength))
+            .Navigation(navigationExpression)
+            .IsRequired();
 
     private static void FullNameTypeBuilder<TEntity>(OwnedNavigationBuilder<TEntity, FullName> builder)
         where TEntity : class
