@@ -10,8 +10,6 @@ namespace Mesawer.DomainLayer.ValueObjects;
 
 public class WeakLocalizedString : ValueObject
 {
-    protected WeakLocalizedString() { }
-
     public virtual string Ar { get; set; }
     public virtual string En { get; set; }
 
