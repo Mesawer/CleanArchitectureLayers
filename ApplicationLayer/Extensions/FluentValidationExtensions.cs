@@ -191,7 +191,6 @@ public static class FluentValidationExtensions
         this IRuleBuilder<T, LocalizedStringDto> builder,
         int maxLength = NameMaxLength)
         => builder
-            .NotNull()
             .ChildRules(str =>
             {
                 str.RuleFor(s => s.Ar).MaximumLength(maxLength);
@@ -199,6 +198,7 @@ public static class FluentValidationExtensions
                 str.RuleFor(s => s.En).MaximumLength(maxLength);
             });
 
+    // TODO: Accept predicates
     public static IRuleBuilder<T, LocalizedStringDto> UniqueLocalizedString<T, TEntity>(
         this IRuleBuilder<T, LocalizedStringDto> builder,
         IQueryable<TEntity> queryable,
@@ -242,6 +242,7 @@ public static class FluentValidationExtensions
                     .WithMessage(SharedRes.NameAlreadyExists);
             });
 
+    // TODO: Accept predicates
     public static IRuleBuilder<T, Localizable<TKey>> UniqueLocalizedString<T, TEntity, TKey>(
         this IRuleBuilder<T, Localizable<TKey>> builder,
         IQueryable<TEntity> queryable,
