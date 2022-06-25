@@ -64,7 +64,7 @@ public static class ProgramExtensions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+            logger.LogCritical(ex, "An error occurred while migrating or seeding the database.");
 
             throw;
         }
@@ -72,10 +72,24 @@ public static class ProgramExtensions
         return host;
     }
 
-    public static async Task RunAsync(this Task<IHost> hostTask)
+    public static async Task RunAsync<TProgram>(this Task<IHost> hostTask)
     {
         var host = await hostTask;
-        await host.RunAsync();
-        Log.CloseAndFlush();
+
+        using var scope = host.Services.CreateScope();
+
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<TProgram>>();
+
+        try
+        {
+            await host.RunAsync();
+            Log.CloseAndFlush();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "An error occurred while running the application.");
+
+            throw;
+        }
     }
 }

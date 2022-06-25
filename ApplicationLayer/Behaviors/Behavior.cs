@@ -46,16 +46,16 @@ public class Behavior<TRequest>
         };
 
         // Part 1: Request Logging
-        message.Append($"{"Request",7}: ({{ReqName}}), {{@Req}}");
+        message.Append($"{"Request",7}: ({{ReqName}}), {{Req}}");
 
         // Part 2: User Data Logging
-        if (_currentUser is not null)
+        if (_currentUser?.Id is not null)
         {
             var userId   = _currentUser.Id ?? string.Empty;
             var userName = _currentUser.UserName ?? string.Empty;
             var email    = _currentUser.Email ?? string.Empty;
 
-            message.Append($"\n{"User",7}: @{{UserId}}, @{{Username}}, @{{Email}}");
+            message.Append($"\n{"User",7}: {{UserId}}, {{Username}}, {{Email}}");
 
             args.Add(userId);
             args.Add(userName);
@@ -67,7 +67,7 @@ public class Behavior<TRequest>
         {
             foreach (var (k, value) in extra)
             {
-                message.Append($"\n{k}: @{{{k}}}");
+                message.Append($"\n{k}: {{{k}}}");
                 args.Add(value);
             }
         }
