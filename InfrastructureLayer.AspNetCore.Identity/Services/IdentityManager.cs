@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using Mesawer.ApplicationLayer;
 using Mesawer.ApplicationLayer.AspNetCore.Identity.Exceptions;
 using Mesawer.ApplicationLayer.AspNetCore.Identity.Interfaces;
+using Mesawer.ApplicationLayer.Enums;
+using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.DomainLayer.AspNetCore.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -42,9 +44,11 @@ public class IdentityManager<TUser> : IIdentityManager<TUser> where TUser : Appl
 
     public string GetPhoneNumber(string phoneNumber)
     {
-        if (_identityOptions.AcceptedCodes is null || !_identityOptions.AcceptedCodes.Any()) return phoneNumber;
+        var acceptedCodes = _identityOptions.AcceptedCodes is not null && _identityOptions.AcceptedCodes.Any()
+            ? _identityOptions.AcceptedCodes
+            : EnumExtensions.ToArray<PhoneNumberCode>();
 
-        var codes = _identityOptions.AcceptedCodes
+        var codes = acceptedCodes
             .Select(c => (int) c)
             .Select(c => (c / 100, c % 100));
 
