@@ -7,6 +7,8 @@
 ## Overview
 
 Current Version: 3.0.0
+  - Refactor for minimal APIs
+  - Remove unused/business-dependent code
 
 ### Domain
 
