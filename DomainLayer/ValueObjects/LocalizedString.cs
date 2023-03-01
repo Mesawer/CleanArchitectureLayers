@@ -1,11 +1,17 @@
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.Exceptions;
 
 namespace Mesawer.DomainLayer.ValueObjects;
 
+[PublicAPI]
 public class LocalizedString : WeakLocalizedString
 {
-    private LocalizedString() { }
+    private LocalizedString()
+    {
+        _ar = null!;
+        _en = null!;
+    }
 
     private string _ar;
 

@@ -3,62 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using Mesawer.ApplicationLayer.Models;
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class QueryableExtensions
 {
-    /// <summary>
-    /// Creates a paginated list from the passed in queryable by applying the paging options request.
-    /// </summary>
-    public static Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(
-        this IQueryable<TDestination> queryable,
-        PagingOptionsRequest options,
-        CancellationToken ct = default)
-        => PaginatedList<TDestination>.CreateAsync(queryable, options, false, ct);
-
-    /// <summary>
-    /// Creates a paginated list from the passed in queryable by applying the paging options request.
-    /// </summary>
-    /// <remarks>It returns all the items in the first page.</remarks>
-    public static Task<PaginatedList<TDestination>> ToAllPaginatedListAsync<TDestination>(
-        this IQueryable<TDestination> queryable,
-        PagingOptionsRequest options,
-        CancellationToken ct = default)
-        => PaginatedList<TDestination>.CreateAsync(queryable, options, true, ct);
-
-    /// <summary>
-    /// Creates a grouping list from the passed in queryable by using the passed in key selector.
-    /// </summary>
-    public static async Task<List<Grouping<TTarget>>> ToGroupingAsync<TTarget, TSource, TKey>(
-        this IQueryable<TSource> queryable,
-        Func<TSource, TKey> keySelector,
-        CancellationToken ct,
-        params object[] optionalParameters)
-        where TSource : class
-        => (await queryable.ToListAsync(ct))
-            .GroupBy(keySelector)
-            .Select(c => new Grouping<TTarget>
-            {
-                Key   = Convert.ToInt32(c.Key),
-                Items = c.ProjectTo<TTarget, TSource>(optionalParameters).ToList()
-            })
-            .ToList();
-
-    /// <summary>
-    /// Applies the search options using the passed in expressions on the passed in queryable.
-    /// </summary>
-    public static IQueryable<T> Search<T>(
-        this IQueryable<T> queryable,
-        PagingOptionsRequest options,
-        params Expression<Func<T, object>>[] expressions)
-        => options.ApplyQuery(queryable, expressions);
-
     /// <summary>
     /// Projects an object to the respective target by calling the static mapping method and send the optional parameters
     /// </summary>
@@ -69,19 +21,8 @@ public static class QueryableExtensions
     {
         var method = typeof(TTarget).GetProjectToMethod(typeof(TSource), optionalParameters.Length);
 
-        return queryable.Select(c => method.InvokeProjectToMethod<TTarget>(c, optionalParameters)).AsQueryable();
+        return queryable.Select(c => method.InvokeProjectToMethod<TTarget>(c, optionalParameters)!);
     }
-
-    /// <summary>
-    ///     Finds an entity with the given primary key value. If an entity with the given primary key value
-    ///     is being tracked by the context, then it is returned immediately without making a request to the
-    ///     database. Otherwise, a query is made to the database for an entity with the given primary key value
-    ///     and this entity, if found, is attached to the context and returned. If no entity is found, then
-    ///     null is returned.
-    /// </summary>
-    public static Task<T> FindByKeyAsync<T>(this DbSet<T> source, object key, CancellationToken ct = default)
-        where T : class
-        => source.FindAsync(new[] { key }, ct).AsTask();
 
     /// <summary>
     /// Sorts the elements of a sequence in ascending order.
@@ -228,97 +169,5 @@ public static class QueryableExtensions
 
         // query = query.Where...
         return query.Where(lambdaExpression).AsQueryable();
-    }
-
-    public static Task<bool> LocalizedStringAllNotEquals<T>(
-        this IQueryable<T> query,
-        PropertyInfo property,
-        string lang,
-        string value,
-        CancellationToken ct)
-    {
-        var langProperty = typeof(LocalizedString)
-            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .FirstOrDefault(p => p.Name == lang);
-
-        if (langProperty is null) return Task.FromResult(true);
-
-        var toLower = typeof(string).GetMethods()
-            .First(m => m.Name == nameof(string.ToLower) && !m.GetParameters().Any());
-
-        var obj = Expression.Parameter(typeof(T));
-
-        // x.property.langProperty
-        var exp1       = Expression.Property(obj, property);
-        var expression = Expression.Property(exp1, langProperty);
-
-        // x.property.langProperty.ToLower() != value.Trim().ToLower()
-        var comparisonExpressions =
-            (Expression) Expression.NotEqual(Expression.Call(expression, toLower),
-                Expression.Constant(value.Trim().ToLower()));
-
-        var lambdaExpression = Expression.Lambda<Func<T, bool>>(comparisonExpressions, obj);
-
-        // query = query.Where...
-        return query.AllAsync(lambdaExpression, ct);
-    }
-
-    public static async Task<bool> LocalizedStringOnlyNotEquals<T, TKey>(
-        this IQueryable<T> query,
-        PropertyInfo keyProperty,
-        PropertyInfo property,
-        string lang,
-        TKey key,
-        string value,
-        CancellationToken ct)
-    {
-        var langProperty = typeof(LocalizedString)
-            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .FirstOrDefault(p => p.Name == lang);
-
-        if (langProperty is null) return true;
-
-        var obj = Expression.Parameter(typeof(T));
-
-        // x.property.langProperty
-        var exp1       = Expression.Property(obj, property);
-        var expression = Expression.Property(exp1, langProperty);
-
-        // x.property.langProperty == value.Trim().ToLower()
-        var comparisonExpressions =
-            (Expression) Expression.Equal(expression, Expression.Constant(value.Trim().ToLower()));
-
-        var lambdaExpression = Expression.Lambda<Func<T, bool>>(comparisonExpressions, obj);
-
-        var matches = await query.Where(lambdaExpression).ToListAsync(ct);
-
-        if (!matches.Any()) return true;
-        if (matches.Count > 1) return false;
-
-        return keyProperty.GetValue(matches.First())?.Equals(key) ?? true;
-    }
-
-    /// <summary>
-    /// Checks if a property's value exits in the passed in values.
-    /// </summary>
-    public static Task<bool> In<T, TKey>(
-        this IQueryable<T> queryable,
-        Expression<Func<T, TKey>> expression,
-        params TKey[] values)
-    {
-        if (values is null || !values.Any()) return Task.FromResult(false);
-
-        // key == value1, key == value2, ...
-        var parts = values
-            .Select(v => (Expression) Expression.Equal(expression.Body, Expression.Constant(v)))
-            .ToArray();
-
-        // key == value1 || key == value2 || ...
-        var comparisonExpression = ReflectionExtensions.Or(parts);
-
-        // x => key == value1 || key == value2 || ...
-        var lambdaExpression = Expression.Lambda<Func<T, bool>>(comparisonExpression, expression.Parameters);
-
-        return queryable.AnyAsync(lambdaExpression);
     }
 }

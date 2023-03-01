@@ -156,4 +156,7 @@
   <data name="ValidationError" xml:space="preserve">
     <value>One or more validation failures have occurred</value>
   </data>
+  <data name="RequestCannotBeProcessed" xml:space="preserve">
+    <value>This request can't be processed right now, please try again later.</value>
+  </data>
 </root>

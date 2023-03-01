@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentValidation;
+using JetBrains.Annotations;
 using MediatR;
 using MediatR.Pipeline;
 using Mesawer.ApplicationLayer.Behaviors;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mesawer.ApplicationLayer;
 
+[PublicAPI]
 public static class DependencyInjection
 {
     public static IServiceCollection ConfigureApplicationLayer(

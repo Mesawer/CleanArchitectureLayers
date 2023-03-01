@@ -14,9 +14,12 @@ public class BackgroundJobService : IBackgroundJobService
 
     public string Enqueue(Expression<Action> method) => _backgroundJob.Enqueue(method);
 
-    public void Enqueue(Expression<Func<Task>> method) => _backgroundJob.Enqueue(method);
+    public string Enqueue<T>(Expression<Func<T, Task>> methodCall) where T : notnull
+        => _backgroundJob.Enqueue(methodCall);
 
-    public void Schedule(Expression<Action> method, TimeSpan delay) => _backgroundJob.Schedule(method, delay);
+    public string Enqueue(Expression<Func<Task>> method) => _backgroundJob.Enqueue(method);
+
+    public string Schedule(Expression<Action> method, TimeSpan delay) => _backgroundJob.Schedule(method, delay);
 
     public string Schedule(Expression<Func<Task>> method, TimeSpan delay) => _backgroundJob.Schedule(method, delay);
 

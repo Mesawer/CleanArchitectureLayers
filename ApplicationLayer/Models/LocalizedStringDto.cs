@@ -1,16 +1,28 @@
 using System;
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.ValueObjects;
 
 namespace Mesawer.ApplicationLayer.Models;
 
+[PublicAPI]
 public class LocalizedStringDto
 {
     public string Ar { get; init; }
     public string En { get; init; }
 
-    public LocalizedString ToLocalizedString() => (LocalizedString) (Ar, En);
+    public LocalizedString ToLocalizedString()
+    {
+        if (Ar is null || En is null) return null;
 
-    public WeakLocalizedString ToWeakLocalizedString() => (WeakLocalizedString) (Ar, En);
+        return (LocalizedString) (Ar, En);
+    }
+
+    public WeakLocalizedString ToWeakLocalizedString()
+    {
+        if (Ar is null || En is null) return null;
+
+        return (WeakLocalizedString) (Ar, En);
+    }
 
     public static LocalizedStringDto Create(LocalizedString source)
         => new()

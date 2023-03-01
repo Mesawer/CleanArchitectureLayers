@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class ClaimsPrincipleExtensions
 {
     /// <summary>

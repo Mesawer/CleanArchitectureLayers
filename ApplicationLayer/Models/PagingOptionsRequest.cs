@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using FluentValidation;
+using JetBrains.Annotations;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.DomainLayer.ValueObjects;
 
 namespace Mesawer.ApplicationLayer.Models;
 
+[PublicAPI]
 public class PagingOptionsRequest
 {
     public int? Offset { get; set; }

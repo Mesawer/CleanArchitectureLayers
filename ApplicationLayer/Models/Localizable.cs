@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Mesawer.ApplicationLayer.Models;
 
+[PublicAPI]
 public class Localizable<T>
 {
     public Localizable(T key, LocalizedStringDto s)

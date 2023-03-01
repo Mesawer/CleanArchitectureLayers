@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Mesawer.ApplicationLayer;
 using Microsoft.Extensions.Hosting;
 
 namespace Mesawer.PresentationLayer;
 
+[PublicAPI]
 public class PresentationOptions
 {
     private readonly string _environmentName;
@@ -13,6 +15,8 @@ public class PresentationOptions
         => _environmentName = Environment.GetEnvironmentVariable(Constants.EnvironmentVariableName);
 
     public string ApiTitle { get; set; }
+    public string ApiDescription { get; set; }
+
     public string Version { get; set; } = "1.0";
 
     public string CorsPolicy { get; set; } = "CorsPolicy";

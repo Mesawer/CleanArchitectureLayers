@@ -1,7 +1,9 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Mesawer.DomainLayer.Exceptions;
 
+[PublicAPI]
 public abstract class DomainException : Exception
 {
     protected DomainException() { }

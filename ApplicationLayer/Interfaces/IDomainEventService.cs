@@ -1,10 +1,10 @@
-using System.Threading;
 using System.Threading.Tasks;
-using Mesawer.DomainLayer.Models;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Interfaces;
 
+[PublicAPI]
 public interface IDomainEventService
 {
-    Task Publish(DomainEvent e, CancellationToken ct = default);
+    Task Publish(string fullName, string serializedDomainEvent);
 }

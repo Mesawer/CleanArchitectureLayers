@@ -5,7 +5,7 @@
     <RootNamespace>Mesawer.InfrastructureLayer</RootNamespace>
     <PackageId>Mesawer.InfrastructureLayer</PackageId>
     <Authors>Mesawer</Authors>
-    <Product/>
+    <Product />
     <Description>This library contains all the required reusable components in the infrastructure layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>mesawer, application, layer, tiers, extensions, helpers</PackageTags>
@@ -15,30 +15,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4"/>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.4"/>
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.4"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.4"/>
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.28"/>
-    <PackageReference Include="HangFire.Core" Version="1.7.28"/>
-    <PackageReference Include="HangFire.SqlServer" Version="1.7.28"/>
-    <PackageReference Include="SendGrid" Version="9.24.2"/>
-    <PackageReference Include="Serilog" Version="2.10.0"/>
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.4" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.28" />
+    <PackageReference Include="HangFire.Core" Version="1.7.28" />
+    <PackageReference Include="Hangfire.InMemory" Version="0.3.4" />
+    <PackageReference Include="HangFire.SqlServer" Version="1.7.28" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ApplicationLayer\ApplicationLayer.csproj"/>
+    <ProjectReference Include="..\ApplicationLayer\ApplicationLayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\Identity\IdentityRes.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>IdentityRes.resx</DependentUpon>
-    </Compile>
     <Compile Update="Resources\SharedRes.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -47,10 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Identity\IdentityRes.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>IdentityRes.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\SharedRes.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SharedRes.Designer.cs</LastGenOutput>

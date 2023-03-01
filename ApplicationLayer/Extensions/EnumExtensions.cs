@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
-public static class EnumExtensions
+[PublicAPI]
+public static class EnumsExtensions
 {
     /// <summary>
     /// Converts an enum to array of its values.

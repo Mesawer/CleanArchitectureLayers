@@ -6,6 +6,7 @@ using Mesawer.DomainLayer.Exceptions;
 using MediatR;
 using Mesawer.ApplicationLayer.Exceptions;
 using Mesawer.ApplicationLayer.Resources.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Mesawer.ApplicationLayer.Behaviors;
@@ -13,7 +14,9 @@ namespace Mesawer.ApplicationLayer.Behaviors;
 public class UnhandledExceptionBehavior<TRequest, TResponse>
     : Behavior<TRequest>, IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
-    public UnhandledExceptionBehavior(ILogger<TRequest> logger) : base(logger) { }
+    public UnhandledExceptionBehavior(
+        ILogger<UnhandledExceptionBehavior<TRequest, TResponse>> logger,
+        IHttpContextAccessor httpContextAccessor) : base(logger, httpContextAccessor) { }
 
     public async Task<TResponse> Handle(
         TRequest request,
@@ -60,9 +63,16 @@ public class UnhandledExceptionBehavior<TRequest, TResponse>
         }
         catch (Exception e) when (e is not ValidationException)
         {
+            if (e is ConcurrencyException)
+            {
+                LogCritical("CONCURRENCY_EXCEPTION", request, new Dictionary<string, object> { { "Error", e } });
+
+                throw new BadRequestException(SharedRes.RequestCannotBeProcessed);
+            }
+
             LogError("UNHANDLED_EXC", request, new Dictionary<string, object> { { "Exception", e } });
 
-            throw new UnhandledRequestException($"Unhandled Request Exception in {typeof(TRequest).Name}", e);
+            throw new BadRequestException(SharedRes.RequestCannotBeProcessed, e);
         }
     }
 }

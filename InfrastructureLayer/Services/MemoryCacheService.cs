@@ -1,6 +1,4 @@
-using Mesawer.ApplicationLayer.Enums;
 using Mesawer.ApplicationLayer.Interfaces;
-using Mesawer.ApplicationLayer.Models;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Mesawer.InfrastructureLayer.Services;
@@ -18,21 +16,14 @@ public class MemoryCacheService : IMemoryCacheService
         return exists ? token : null;
     }
 
-    public TokenObject Get(TokenType type, string userId)
+    public T Get<T>(string key)
     {
-        var obj = Get(GenerateTokenKey(type, userId));
+        var exists = _cache.TryGetValue(key, out var token);
 
-        return obj as TokenObject;
+        return exists ? (T) token : default;
     }
 
     public void Add(string key, object content) => _cache.Set(key, content);
 
-    public void Add(string userId, TokenObject token)
-        => _cache.Set(GenerateTokenKey(token.Type, userId), token, token.ExpiresAt);
-
     public void Remove(string key) => _cache.Remove(key);
-
-    public void Remove(TokenType type, string userId) => _cache.Remove(GenerateTokenKey(type, userId));
-
-    private static string GenerateTokenKey(TokenType type, string userId) => $"{type.ToString().ToLower()}-{userId}";
 }

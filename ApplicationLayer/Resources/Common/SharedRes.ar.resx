@@ -156,4 +156,7 @@
   <data name="ValidationError" xml:space="preserve">
     <value>يوجد خطأ في احد البيانات المدخلة</value>
   </data>
+  <data name="RequestCannotBeProcessed" xml:space="preserve">
+    <value>هذا الطلب لا يمكن تنفيذه في هذا الوقت ، برجاء المحاولة مرة اخرى.</value>
+  </data>
 </root>

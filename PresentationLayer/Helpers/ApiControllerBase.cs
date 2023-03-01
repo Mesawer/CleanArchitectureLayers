@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using MediatR;
 using Mesawer.ApplicationLayer.Interfaces;
 using Mesawer.PresentationLayer.Models;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mesawer.PresentationLayer.Helpers;
 
+[PublicAPI]
 [ApiController]
 [Route("api/[controller]")]
 [ApiConventionType(typeof(ApiConventions))]
@@ -19,7 +21,7 @@ public abstract class ApiControllerBase : ControllerBase
 
     protected IMediator Mediator
         => _mediator ??= HttpContext.RequestServices.GetService<IMediator>()
-                         ?? throw new ArgumentNullException(nameof(Mediator), "Mediator service not registered");
+                         ?? throw new ArgumentNullException(nameof(Mediator), @"Mediator service not registered");
 
     protected async Task<ActionResult<T>> Execute<T>(IRequest<T> request, CancellationToken token) where T : class
         => request is { }

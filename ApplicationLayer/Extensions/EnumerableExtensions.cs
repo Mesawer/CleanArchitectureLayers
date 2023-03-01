@@ -1,11 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class EnumerableExtensions
 {
+    /// <summary>
+    /// Runs a certain tasks sequence-ly synchronously (one after another)
+    /// </summary>
+    public static async Task<List<T>> ToListAsync<T>(this IEnumerable<Task<T>> enumerable)
+        => (await Task.WhenAll(enumerable)).ToList();
+
+    public static async Task ToListAsync(this IEnumerable<Task> enumerable) => await Task.WhenAll(enumerable.ToArray());
+
     /// <summary>
     /// Projects an object to the respective target by calling the static mapping method and send the optional parameters
     /// </summary>
@@ -14,7 +25,7 @@ public static class EnumerableExtensions
         params object[] optionalParameters)
         where TSource : class
     {
-        var method = typeof(TTarget).GetProjectToMethod(typeof(TSource), optionalParameters.Length);
+        var method = typeof(TTarget).GetProjectToMethod(typeof(TSource), optionalParameters?.Length ?? 0);
 
         return enumerable.Select(c => method.InvokeProjectToMethod<TTarget>(c, optionalParameters));
     }

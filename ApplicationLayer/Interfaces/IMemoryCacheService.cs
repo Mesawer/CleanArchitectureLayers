@@ -1,15 +1,12 @@
-using Mesawer.ApplicationLayer.Enums;
-using Mesawer.ApplicationLayer.Models;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Interfaces;
 
+[PublicAPI]
 public interface IMemoryCacheService
 {
     object Get(string key);
-    TokenObject Get(TokenType type, string userId);
+    T Get<T>(string key);
     void Add(string key, object content);
-    void Add(string userId, TokenObject token);
     void Remove(string key);
-    void Remove(TokenType type, string userId);
-
 }

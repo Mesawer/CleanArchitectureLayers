@@ -4,12 +4,16 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class StringExtensions
 {
+    public static bool IsEmptyConfig(this string str) => string.IsNullOrEmpty(str) || str == "EMPTY";
+
     /// <summary>
     /// Deserializes the JSON to the specified .NET type
     /// with default value in case of invalid conversion.
@@ -27,13 +31,29 @@ public static class StringExtensions
     }
 
     /// <summary>
+    /// Deserializes the JSON to the specified .NET type
+    /// with default value in case of invalid conversion.
+    /// </summary>
+    public static object DeserializeSafely(this string value)
+    {
+        try
+        {
+            return JsonConvert.DeserializeObject(value);
+        }
+        catch
+        {
+            return value;
+        }
+    }
+
+    /// <summary>
     /// Generates a username from the user's email.
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
     public static string GenerateUsername(this string email)
     {
-        var key = email.Split('@').First();
+        var key = string.Join(string.Empty, email.Split('@').First().ToCharArray().Take(50).ToArray());
 
         return $"{key}.{Guid.NewGuid().ToString().Split('-').First()[..4]}";
     }

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Mesawer.DomainLayer.Models;
 
 // Learn more: https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/microservice-ddd-cqrs-patterns/implement-value-objects
+[PublicAPI]
 public abstract class ValueObject
 {
     protected static bool EqualOperator(ValueObject left, ValueObject right)

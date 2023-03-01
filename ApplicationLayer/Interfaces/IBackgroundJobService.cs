@@ -1,9 +1,11 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Interfaces;
 
+[PublicAPI]
 public interface IBackgroundJobService
 {
     /// <summary>
@@ -17,6 +19,17 @@ public interface IBackgroundJobService
     string Enqueue(Expression<Action> method);
 
     /// <summary>
+    /// Creates a background job based on a specified lambda expression
+    /// and places it into its actual queue.
+    /// Please, see the <see cref="T:Hangfire.QueueAttribute" /> to learn how to
+    /// place the job on a non-default queue.
+    /// </summary>
+    /// <typeparam name="T">Type whose method will be invoked during job processing.</typeparam>
+    /// <param name="methodCall">Instance method call expression that will be marshalled to the Server.</param>
+    /// <returns>Unique identifier of the created job.</returns>
+    string Enqueue<T>(Expression<Func<T, Task>> methodCall) where T : notnull;
+
+    /// <summary>
     /// Creates a new fire-and-forget job based on a given method call expression.
     /// </summary>
     /// <param name="method">Method call expression that will be marshalled to a server.</param>
@@ -24,7 +37,7 @@ public interface IBackgroundJobService
     /// <exception cref="ArgumentNullException">
     /// <paramref name="method"/> is <see langword="null"/>.
     /// </exception>
-    void Enqueue(Expression<Func<Task>> method);
+    string Enqueue(Expression<Func<Task>> method);
 
     /// <summary>
     /// Creates a new background job based on a specified method
@@ -33,7 +46,7 @@ public interface IBackgroundJobService
     /// <param name="method">Instance method call expression that will be marshalled to the Server.</param>
     /// <param name="delay">Delay, after which the job will be enqueued.</param>
     /// <returns>Unique identifier of the created job.</returns>
-    void Schedule(Expression<Action> method, TimeSpan delay);
+    string Schedule(Expression<Action> method, TimeSpan delay);
 
     /// <summary>
     /// Creates a new background job based on a specified method

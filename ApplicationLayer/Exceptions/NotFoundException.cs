@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using Mesawer.ApplicationLayer.Resources.Common;
 
 namespace Mesawer.ApplicationLayer.Exceptions;
@@ -6,6 +7,7 @@ namespace Mesawer.ApplicationLayer.Exceptions;
 /// <summary>
 /// An exception that should be thrown if the user is trying to access data that isn't found
 /// </summary>
+[PublicAPI]
 public class NotFoundException : Exception
 {
     public NotFoundException()

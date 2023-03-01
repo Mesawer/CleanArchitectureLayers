@@ -1,8 +1,10 @@
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.ValueObjects;
 using static Mesawer.ApplicationLayer.Constants;
 
 namespace Mesawer.ApplicationLayer.Models;
 
+[PublicAPI]
 public class FullNameDto
 {
     public string FirstName { get; set; }
@@ -10,13 +12,15 @@ public class FullNameDto
 
     public FullName ToFullName()
     {
-        var firstName = FirstName.Length >= NameMaxLength
+        var firstName = FirstName?.Length >= NameMaxLength
             ? FirstName[..NameMaxLength]
             : FirstName;
 
-        var lastName = LastName.Length >= NameMaxLength
+        var lastName = LastName?.Length >= NameMaxLength
             ? LastName[..NameMaxLength]
             : LastName;
+
+        if (firstName is null || lastName is null) return null;
 
         return (FullName) (firstName, lastName);
     }

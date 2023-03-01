@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Mesawer.ApplicationLayer.Exceptions;
 using Mesawer.ApplicationLayer.Resources.Common;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using ValidationException = Mesawer.ApplicationLayer.Exceptions.ValidationExcept
 
 namespace Mesawer.PresentationLayer.Filters;
 
+[PublicAPI]
 public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 {
     private readonly IConfiguration                              _configuration;
@@ -52,6 +54,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         if (key is not null)
         {
             _exceptionHandlers[key].Invoke(context);
+
             return;
         }
 
@@ -93,7 +96,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         var details = new ProblemDetails
         {
             Type   = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Title  = "The request is not valid",
+            Title  = exception?.Message ?? "The request is not valid",
             Status = StatusCodes.Status400BadRequest,
             Detail = exception!.Error
         };
@@ -136,8 +139,9 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 
     private void HandleUnhandledRequestException(ExceptionContext context)
     {
-        var currentVersion = _configuration["Version"];
-        var version        = context.HttpContext.Request.Headers["Version"];
+        var currentVersion        = _configuration["Version"];
+        var useDeveloperException = _configuration.GetValue<bool>("UseDeveloperException");
+        var version               = context.HttpContext.Request.Headers["Version"];
 
         if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(currentVersion)
                                           || version.Equals(currentVersion))
@@ -146,8 +150,10 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
             {
                 Type   = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
                 Title  = "An error occurred while processing your request.",
-                Status = StatusCodes.Status500InternalServerError,
+                Status = StatusCodes.Status500InternalServerError
             };
+
+            if (useDeveloperException) details.Extensions.Add("Exception", context.Exception);
 
             context.Result = new ObjectResult(details)
             {

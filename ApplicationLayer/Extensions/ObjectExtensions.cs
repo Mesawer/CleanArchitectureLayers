@@ -2,11 +2,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class ObjectExtensions
 {
+    public static T ToObject<T>(this IReadOnlyDictionary<string, string> source)
+        where T : class, new()
+    {
+        var someObject     = new T();
+        var someObjectType = someObject.GetType();
+
+        foreach (var (key, value) in source)
+        {
+            someObjectType.GetProperty(key)?.SetValue(someObject, value, null);
+        }
+
+        return someObject;
+    }
+
+    public static object ToObject(this IReadOnlyDictionary<string, string> source)
+    {
+        var json = JsonConvert.SerializeObject(source);
+
+        return JsonConvert.DeserializeObject<object>(json);
+    }
+
+    public static T ToObject<T>(this byte[] source)
+        => source is not null ? JsonSerializer.Deserialize<T>(source) : default;
+
+    public static IReadOnlyDictionary<string, string> ToDictionary(this object obj)
+    {
+        var json = JsonConvert.SerializeObject(obj);
+
+        return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+    }
+
     /// <summary>
     /// Projects an object to the respective target by calling the static mapping method and send the optional parameters
     /// </summary>

@@ -1,26 +1,34 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
 using System.Text;
-using Mesawer.ApplicationLayer.Interfaces;
+using JetBrains.Annotations;
+using Mesawer.ApplicationLayer.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Mesawer.ApplicationLayer.Behaviors;
 
 public delegate void Log(string message, params object[] args);
 
+[PublicAPI]
 public class Behavior<TRequest>
 {
-    private readonly ILogger<TRequest>       _logger;
-    private readonly IApplicationUserService _currentUser;
+    private readonly ILogger<Behavior<TRequest>> _logger;
+    private readonly IHttpContextAccessor        _httpContextAccessor;
 
-    public Behavior(ILogger<TRequest> logger) => _logger = logger;
+    public Behavior(ILogger<Behavior<TRequest>> logger) => _logger = logger;
 
-    public Behavior(
-        ILogger<TRequest> logger,
-        IApplicationUserService currentUser)
+    public Behavior(ILogger<Behavior<TRequest>> logger, IHttpContextAccessor httpContextAccessor)
     {
-        _logger      = logger;
-        _currentUser = currentUser;
+        _logger              = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
+
+    private ClaimsPrincipal User => _httpContextAccessor.HttpContext?.User;
+    private string Ip => _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
     public void LogInformation(string key, TRequest request, Dictionary<string, object> extra = null)
         => Log(key, request, _logger.LogInformation, extra);
@@ -39,36 +47,45 @@ public class Behavior<TRequest>
         var requestName = typeof(TRequest).Name;
 
         var message = new StringBuilder($"## {key} ##\n");
+
+        var anyFiles = typeof(TRequest)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Any(c => c.PropertyType.IsOfType(typeof(IFormFile)) && c.GetValue(request) is not null);
+
+        var req = !anyFiles
+            ? JsonConvert.SerializeObject(request)
+            : JsonConvert.SerializeObject(new { Issue = "Can't serialize due to object size" });
+
         var args = new List<object>
         {
-            requestName,
-            request
+            req
         };
 
         // Part 1: Request Logging
-        message.Append($"{"Request",7}: ({{ReqName}}), {{Req}}");
+        message.Append($"{"Request",7}: ({requestName}), {{Req:j}}");
 
         // Part 2: User Data Logging
-        if (_currentUser?.Id is not null)
-        {
-            var userId   = _currentUser.Id ?? string.Empty;
-            var userName = _currentUser.UserName ?? string.Empty;
-            var email    = _currentUser.Email ?? string.Empty;
+        var userId = User.FindFirst("sub")?.Value;
 
-            message.Append($"\n{"User",7}: {{UserId}}, {{Username}}, {{Email}}");
-
-            args.Add(userId);
-            args.Add(userName);
-            args.Add(email);
-        }
+        message.Append($"\nUser: {userId}, IpAddress: {Ip}");
 
         // Part 3: Extras Logging
         if (extra is not null)
         {
             foreach (var (k, value) in extra)
             {
-                message.Append($"\n{k}: {{{k}}}");
-                args.Add(value);
+                if (value is null) continue;
+
+                if (value.GetType().IsValueType)
+                {
+                    message.Append($"\n{k}: {{{k}}}");
+                }
+                else
+                {
+                    message.Append($"\n{k}: {{{k}:j}}");
+                }
+
+                args.Add(JsonConvert.SerializeObject(value));
             }
         }
 

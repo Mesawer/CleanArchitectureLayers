@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Mesawer.DomainLayer.Exceptions;
 
+[PublicAPI]
 public class InvalidValueException : DomainException
 {
     public InvalidValueException()

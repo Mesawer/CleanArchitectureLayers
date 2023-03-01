@@ -2,12 +2,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.Exceptions;
 using Mesawer.DomainLayer.Models;
 using AmbiguousMatchException = System.Reflection.AmbiguousMatchException;
 
 namespace Mesawer.DomainLayer.ValueObjects;
 
+[PublicAPI]
 public class WeakLocalizedString : ValueObject
 {
     public virtual string Ar { get; set; }
@@ -34,7 +36,7 @@ public class WeakLocalizedString : ValueObject
         if (property is null) throw new UnsupportedLanguageException(lang);
 
         if (!property.CanRead || property.PropertyType != typeof(string))
-            throw new AmbiguousMatchException("Language match can't be read");
+            throw new Exceptions.AmbiguousMatchException("Language match can't be read");
 
         return property.GetValue(this)?.ToString() ?? Ar;
     }

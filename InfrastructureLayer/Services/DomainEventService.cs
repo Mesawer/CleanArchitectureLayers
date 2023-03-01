@@ -20,35 +20,28 @@ public class DomainEventService : IDomainEventService
         _logger          = logger;
     }
 
-    public Task Publish(DomainEvent e, CancellationToken ct = default)
+    public Task Publish(string fullName, string serializedDomainEvent)
     {
-        _logger.LogInformation("Publishing domain event. Event - {Event}", e.GetType().Name);
-        return Handle(e, ct);
+        _logger.LogInformation("Publishing domain event. Event - {Event}", fullName);
+
+        var type = GetType(fullName);
+
+        var domainEvent = DomainEvent.GetDomainEvent(type, serializedDomainEvent);
+
+        return Handle(domainEvent);
     }
 
-    private Task Handle(DomainEvent e, CancellationToken ct)
+    private Task Handle(DomainEvent e)
     {
         var eventType    = e.GetType();
         var handlerType  = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
         var handleMethod = handlerType.GetMethod(nameof(IDomainEventHandler<DomainEvent>.Handle));
 
-        if (handleMethod is null) throw new InvalidOperationException("Could not find 'Handle' method implemented");
+        var handler = _serviceProvider.GetRequiredService(handlerType);
 
-        var handlers = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(p => handlerType.IsAssignableFrom(p))
-            .ToList();
-
-        if (!handlers.Any())
-            throw new InvalidOperationException(
-                $"Could not find an implementation for the interface {handlerType}");
-
-        if (handlers.Count > 1)
-            throw new InvalidOperationException(
-                $"Could not determine which implementation to use for the interface {handlerType}");
-
-        var instance = ActivatorUtilities.CreateInstance(_serviceProvider, handlers.First());
-
-        return (Task) handleMethod.Invoke(instance, new object[] { e, ct });
+        return (Task) handleMethod!.Invoke(handler, new object[] { e, new CancellationToken(false) })!;
     }
+
+    private static Type GetType(string fullName)
+        => AppDomain.CurrentDomain.GetAssemblies().Select(c => c.GetType(fullName)).First(c => c is not null);
 }

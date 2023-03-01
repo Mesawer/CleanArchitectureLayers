@@ -1,4 +1,5 @@
 using System.Threading;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -17,17 +18,22 @@ namespace Mesawer.PresentationLayer.Helpers;
 /// - Put(object)                422 404 400      204 <br/>
 /// - Delete(object id)          404 422          204 <br/>
 /// </summary>
+[PublicAPI]
 public static class ApiConventions
 {
     #region GET
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get() { }
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get(
         [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
@@ -36,6 +42,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get(
@@ -46,6 +54,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get(
@@ -58,12 +68,16 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find() { }
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find(
@@ -73,6 +87,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
@@ -84,6 +100,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
@@ -97,6 +115,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find(
@@ -107,6 +127,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find(
@@ -119,6 +141,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find(
@@ -129,6 +153,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Find(
@@ -143,10 +169,26 @@ public static class ApiConventions
 
     #region Post
 
+    /// <summary>Status code: 204 422 400 </summary>
+    [ProducesDefaultResponseType]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
+    public static void PostNewNoContent(
+        [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Any)]
+        [ApiConventionTypeMatch(ApiConventionTypeMatchBehavior.AssignableFrom)]
+        object _
+    ) { }
+
     /// <summary>Status code: 200 422 400 </summary>
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void PostNew(
@@ -158,6 +200,8 @@ public static class ApiConventions
     /// <summary>Status code: 200 404 422 400 </summary>
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -175,6 +219,8 @@ public static class ApiConventions
     /// <summary>Status code: 204 404 422 400 </summary>
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -191,6 +237,8 @@ public static class ApiConventions
 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]

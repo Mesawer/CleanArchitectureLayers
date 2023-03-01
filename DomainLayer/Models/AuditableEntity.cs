@@ -1,7 +1,9 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Mesawer.DomainLayer.Models;
 
+[PublicAPI]
 public abstract class AuditableEntity
 {
     public DateTimeOffset Created { get; set; }

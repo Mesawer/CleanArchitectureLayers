@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Mesawer.DomainLayer.Models;
 
 namespace Mesawer.DomainLayer.ValueObjects;
 
+[PublicAPI]
 public class FullName : ValueObject
 {
     private FullName() { }
@@ -13,8 +15,8 @@ public class FullName : ValueObject
         LastName  = lastName;
     }
 
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string FirstName { get; }
+    public string LastName { get; }
 
     public static implicit operator string(FullName fullName) => fullName?.ToString();
 

@@ -1,13 +1,32 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer.Extensions;
 
+[PublicAPI]
 public static class ReflectionExtensions
 {
+    /// <summary>
+    /// Build Expressions of each member of type TEntity
+    /// </summary>
+    public static IEnumerable<MemberExpression> BuildExpressions<TEntity, TTarget>(
+        this Expression<Func<TEntity, object>> expression)
+    {
+        var bodyType = expression.Body.Type;
+
+        if (!typeof(TTarget).IsOfType(bodyType)) return Enumerable.Empty<MemberExpression>();
+
+        return typeof(TTarget)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(p => Expression.Property(expression.Body, p))
+            .ToArray();
+    }
+
     /// <summary>
     /// Creates a selector expression using a property name e.g. c => c.Property
     /// </summary>
@@ -50,7 +69,7 @@ public static class ReflectionExtensions
     {
         var parameters = new List<object> { source };
 
-        parameters.AddRange(optionalParameters);
+        parameters.AddRange(optionalParameters ?? Array.Empty<object>());
 
         return (T) methodInfo.Invoke(null, parameters.ToArray());
     }
@@ -85,11 +104,22 @@ public static class ReflectionExtensions
     /// </summary>
     public static bool IsOfType(this Type sourceType, Type testType)
     {
-        if (!sourceType.IsGenericType) return sourceType == testType || sourceType.IsSubclassOf(testType);
+        var isOfType = sourceType == testType || sourceType.IsSubclassOf(testType) ||
+                       testType.IsAssignableFrom(sourceType);
 
-        if (sourceType.GetGenericTypeDefinition() != typeof(Nullable<>)) return false;
+        if (isOfType) return true;
 
-        var innerType = sourceType.GetInnerTypes()[0];
+        if (!sourceType.IsGenericType) return false;
+
+        if (sourceType.GetGenericTypeDefinition() != typeof(Nullable<>) &&
+            sourceType.GetGenericTypeDefinition().IsSubclassOf(typeof(IEnumerable)))
+            return false;
+
+        var types = sourceType.GetInnerTypes();
+
+        if (types is null) return false;
+
+        var innerType = types[0];
 
         return testType == innerType || innerType.IsSubclassOf(sourceType);
     }
@@ -107,6 +137,9 @@ public static class ReflectionExtensions
         return type.GetGenericArguments();
     }
 
+    /// <summary>
+    /// Get the default value of a specific <paramref name="type"/>
+    /// </summary>
     public static object GetDefault(this Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
 
     /// <summary>

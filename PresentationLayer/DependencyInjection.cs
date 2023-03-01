@@ -1,7 +1,7 @@
-using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 using FluentValidation.AspNetCore;
+using JetBrains.Annotations;
 using Mesawer.ApplicationLayer.Extensions;
 using Mesawer.PresentationLayer.Filters;
 using Microsoft.AspNetCore.Builder;
@@ -15,40 +15,29 @@ using NSwag.Generation.Processors.Security;
 
 namespace Mesawer.PresentationLayer;
 
+[PublicAPI]
 public static class DependencyInjection
 {
-    public static IServiceCollection ConfigurePresentationLayer(
-        this IServiceCollection services,
-        Action<PresentationOptions> configureOptions)
-    {
-        var options = new PresentationOptions();
-
-        configureOptions(options);
-
-        services.AddCors(options);
-        services.ConfigureLocalization();
-        services.ConfigureDocs(options);
-        services.ConfigureMvcApi();
-
-        return services;
-    }
-
     private static void AddCors(this IServiceCollection services, PresentationOptions options)
         => services.AddCors(ops => ops.AddPolicy(options.CorsPolicy,
             builder =>
             {
                 if (!options.IsProduction)
                 {
-                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithExposedHeaders("Content-Disposition");
                     return;
                 }
 
-                options.CorsOrigins?
+                options.CorsOrigins!
                     .Select(o => o.Value)
                     .Where(value => !string.IsNullOrEmpty(value))
                     .ForEach(value => builder
                         .AllowAnyMethod().AllowAnyHeader()
                         .WithOrigins(value)
+                        .WithExposedHeaders("Content-Disposition")
                         .AllowCredentials());
             }));
 
@@ -80,7 +69,7 @@ public static class DependencyInjection
                 configure.Title        = options.ApiTitle ?? "API";
                 configure.Version      = options.Version;
                 configure.DocumentName = "specification";
-                configure.Description  = ApiDocs.Description;
+                configure.Description  = options.ApiDescription;
 
                 configure.AddSecurity("JWT",
                     Enumerable.Empty<string>(),

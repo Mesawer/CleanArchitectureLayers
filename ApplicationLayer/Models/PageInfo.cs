@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Mesawer.ApplicationLayer.Models;
 
+[PublicAPI]
 public class PageInfo
 {
     public int PageIndex { get; set; }

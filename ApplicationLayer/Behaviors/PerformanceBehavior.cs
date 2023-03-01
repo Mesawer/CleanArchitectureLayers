@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Mesawer.ApplicationLayer.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Mesawer.ApplicationLayer.Behaviors;
@@ -14,8 +14,8 @@ public class PerformanceBehavior<TRequest, TResponse> : Behavior<TRequest>, IPip
     private readonly Stopwatch _timer;
 
     public PerformanceBehavior(
-        ILogger<TRequest> logger,
-        IApplicationUserService currentUser) : base(logger, currentUser)
+        ILogger<PerformanceBehavior<TRequest, TResponse>> logger,
+        IHttpContextAccessor httpContextAccessor) : base(logger, httpContextAccessor)
         => _timer = new Stopwatch();
 
     public async Task<TResponse> Handle(

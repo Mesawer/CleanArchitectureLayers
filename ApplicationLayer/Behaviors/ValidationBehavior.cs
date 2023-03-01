@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using Mesawer.ApplicationLayer.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace Mesawer.ApplicationLayer.Behaviors;
@@ -13,7 +14,9 @@ public class ValidationBehavior<TRequest, TResponse> : Behavior<TRequest>, IPipe
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators, ILogger<TRequest> logger)
+    public ValidationBehavior(
+        IEnumerable<IValidator<TRequest>> validators,
+        ILogger<ValidationBehavior<TRequest, TResponse>> logger)
         : base(logger)
         => _validators = validators;
 
@@ -39,6 +42,6 @@ public class ValidationBehavior<TRequest, TResponse> : Behavior<TRequest>, IPipe
 
         LogError("VALIDATION_EXC", request, new Dictionary<string, object> { { "Failures", failures } });
 
-        throw new Exceptions.ValidationException(failures);
+        throw new FluentValidationException(failures);
     }
 }

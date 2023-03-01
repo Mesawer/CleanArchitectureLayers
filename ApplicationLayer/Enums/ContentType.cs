@@ -1,6 +1,6 @@
 namespace Mesawer.ApplicationLayer.Enums;
 
-public enum FileType
+public enum ContentType
 {
     Picture,
     Audio,
