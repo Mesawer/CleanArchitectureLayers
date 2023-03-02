@@ -12,7 +12,7 @@ namespace Mesawer.InfrastructureLayer;
 [PublicAPI]
 public static class DependencyInjection
 {
-    private static void ConfigureHangfire(this IServiceCollection services, HangfireOptions options)
+    public static void ConfigureHangfire(this IServiceCollection services, HangfireOptions options)
     {
         if (!options.UseHangfire)
         {
@@ -59,7 +59,7 @@ public static class DependencyInjection
     /// <summary>
     /// Configure Application Services (e.g. IMemoryCacheService, IDomainEventService, IDateTime)
     /// </summary>
-    private static void ConfigureServices(this IServiceCollection services)
+    public static void ConfigureInfrastructureServices(this IServiceCollection services)
     {
         services.AddScoped<IMemoryCacheService, MemoryCacheService>();
         services.AddScoped<IDomainEventService, DomainEventService>();

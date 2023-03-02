@@ -18,7 +18,7 @@ namespace Mesawer.PresentationLayer;
 [PublicAPI]
 public static class DependencyInjection
 {
-    private static void AddCors(this IServiceCollection services, PresentationOptions options)
+    public static void AddCors(this IServiceCollection services, PresentationOptions options)
         => services.AddCors(ops => ops.AddPolicy(options.CorsPolicy,
             builder =>
             {
@@ -57,14 +57,14 @@ public static class DependencyInjection
         services.AddLocalization();
     }
 
-    private static void ConfigureDocs(
+    public static void ConfigureDocs(
         this IServiceCollection services,
         PresentationOptions options)
     {
         //services.AddSingleton<FluentValidationSchemaProcessor>();
 
         if (!options.IsProduction)
-            services.AddOpenApiDocument((configure, serviceProvider) =>
+            services.AddOpenApiDocument((configure, _) =>
             {
                 configure.Title        = options.ApiTitle ?? "API";
                 configure.Version      = options.Version;
@@ -91,7 +91,7 @@ public static class DependencyInjection
             });
     }
 
-    private static void ConfigureMvcApi(this IServiceCollection services)
+    public static void ConfigureMvcApi(this IServiceCollection services)
     {
         services.AddControllersWithViews(options => options.Filters.Add<ApiExceptionFilterAttribute>())
             .AddNewtonsoftJson(options =>
