@@ -1,3 +1,5 @@
+using System;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace Mesawer.ApplicationLayer;
@@ -8,11 +10,11 @@ public static class Regexes
     /// <summary>
     /// Represent username where
     /// * allowed character is a to z, 0 to 9, _, .
-    /// * minimum of 4 characters and maximum of 30
+    /// * minimum of 4 characters and maximum of 50
     /// * _ and . can not repeated ex: (..)
     /// * can not be suffix or prefix
     /// </summary>
-    public const string UserName = @"^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){1,28}[a-zA-Z0-9]$";
+    public const string UserName = @"^[a-zA-Z0-9]([._](?![._])|[a-zA-Z0-9]){1,48}[a-zA-Z0-9]$";
 
     public const string Email = @"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})";
 
@@ -54,4 +56,25 @@ public static class Regexes
 
     public const string EnglishArabicName =
         @"[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FFa-zA-Z]+[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FFa-zA-Z-_]*";
+
+    public const string IpAddress = @"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)(\.(?!$)|$)){4}$";
+
+    public const string EgyptNationalId =
+        @"^(?<century>[1-4]{1})(?<year>[0-9]{2})(?<month>[0-9]{2})(?<day>[0-9]{2})([0-9]{3})([0-9]{4})$";
+
+    public static DateTime? GetBirthdate(string nationalId)
+    {
+        var match = Regex.Match(nationalId, EgyptNationalId);
+
+        if (!match.Success) return null;
+
+        var century = Convert.ToInt32(match.Groups["century"].Value);
+        var year    = Convert.ToInt32(match.Groups["year"].Value);
+        var month   = Convert.ToInt32(match.Groups["month"].Value);
+        var day     = Convert.ToInt32(match.Groups["day"].Value);
+
+        const int firstCentury = 17;
+
+        return new DateTime((firstCentury + century) * 100 + year, month, day);
+    }
 }

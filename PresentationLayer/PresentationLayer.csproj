@@ -8,9 +8,9 @@
     <Product />
     <Description>This library contains all the required reusable components in the presentation layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>mesawer, application, layer, tiers, extensions, helpers</PackageTags>
+    <PackageTags>mesawer, presentation, layer, tiers, extensions, helpers</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

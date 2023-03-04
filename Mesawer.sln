@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureLayer", "Infr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureLayer.EntityFrameworkCore", "InfrastructureLayer.EntityFrameworkCore\InfrastructureLayer.EntityFrameworkCore.csproj", "{F6373B40-F25F-4FD1-AE3A-94C7754205A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FFD709F-4B66-4F9D-A0C1-E6C5307BC201}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6373B40-F25F-4FD1-AE3A-94C7754205A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6373B40-F25F-4FD1-AE3A-94C7754205A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6373B40-F25F-4FD1-AE3A-94C7754205A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6373B40-F25F-4FD1-AE3A-94C7754205A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
