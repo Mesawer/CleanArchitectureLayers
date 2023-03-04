@@ -6,9 +6,10 @@
 
 ## Overview
 
-Current Version: 3.0.2
+Current Version: 3.0.3
   - Refactor for minimal APIs
   - Remove unused/business-dependent code
+  - Add Mesawer.InfrastructureLayer.EntityFrameworkCore
 
 ### Domain
 
