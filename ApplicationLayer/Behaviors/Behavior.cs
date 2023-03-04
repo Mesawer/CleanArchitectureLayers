@@ -27,8 +27,8 @@ public class Behavior<TRequest>
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private ClaimsPrincipal User => _httpContextAccessor.HttpContext?.User;
-    private string Ip => _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+    private ClaimsPrincipal User => _httpContextAccessor?.HttpContext?.User;
+    private string Ip => _httpContextAccessor?.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
     public void LogInformation(string key, TRequest request, Dictionary<string, object> extra = null)
         => Log(key, request, _logger.LogInformation, extra);
@@ -65,7 +65,7 @@ public class Behavior<TRequest>
         message.Append($"{"Request",7}: ({requestName}), {{Req:j}}");
 
         // Part 2: User Data Logging
-        var userId = User.FindFirst("sub")?.Value;
+        var userId = User?.FindFirst("sub")?.Value;
 
         message.Append($"\nUser: {userId}, IpAddress: {Ip}");
 
